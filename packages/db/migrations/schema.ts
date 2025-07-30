@@ -8,7 +8,6 @@ export const users = pgTable("users", {
 	username: text(),
 	avatarUrl: text("avatar_url"),
 	fullName: text("full_name"),
-	email: text(),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).default(sql`timezone('utc'::text, now())`).notNull(),
 	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).default(sql`timezone('utc'::text, now())`).notNull(),
 }, (table) => [

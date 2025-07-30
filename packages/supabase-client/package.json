@@ -1,0 +1,10 @@
+{
+  "name": "@ai_pair_programmer/supabase-client",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "publishConfig": {
+    "access": "public"
+  }
+}
