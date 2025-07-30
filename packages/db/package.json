@@ -6,7 +6,13 @@
     "@types/bun": "latest"
   },
   "scripts": {
-    "gen:schema": "bunx drizzle-kit introspect"
+    "db:pull": "drizzle-kit introspect",
+    "db:generate": "drizzle-kit generate:pg",
+    "db:drop": "drizzle-kit drop",
+    "db:check": "drizzle-kit check:pg",
+    "db:up": "drizzle-kit up:pg",
+    "db:push": "drizzle-kit push:pg",
+    "db:studio": "bunx drizzle-kit studio"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
