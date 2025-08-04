@@ -6,6 +6,7 @@
     "paths": {
       "@ai_pair_programmer/db": ["../../packages/db"],
       "@ai_pair_programmer/supabse-client": ["../../packages/supabase-client"],
+      "@ai_pair_programmer/redis": ["../../packages/redis"],
     }
   }
 }

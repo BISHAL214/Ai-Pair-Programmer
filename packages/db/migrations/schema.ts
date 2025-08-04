@@ -46,6 +46,7 @@ export const files = pgTable("files", {
 	language: text(),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).default(sql`timezone('utc'::text, now())`).notNull(),
 	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).default(sql`timezone('utc'::text, now())`).notNull(),
+	branch: text(),
 }, (table) => [
 	foreignKey({
 			columns: [table.projectId],

@@ -1,7 +1,9 @@
 {
   "name": "server",
   "scripts": {
-    "dev": "PORT=3001 bun run --hot src/index.ts"
+    "dev": "PORT=3001 bun run --hot src/index.ts",
+    "worker:git": "bun run --hot src/worker/git-extract-worker.ts",
+    "clear:worker:extractor": "bun run --hot src/clear-queue.ts"
   },
   "dependencies": {
     "dotenv": "^17.2.1",
