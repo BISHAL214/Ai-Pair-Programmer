@@ -11,13 +11,14 @@ import { serve } from "inngest/hono";
 import { inngest } from "@ai_pair_programmer/inngest";
 import { waitForContainer } from "./inngest/functions/waitForCOntainer";
 import { startFileSync } from "./inngest/functions/startFileSync";
+import { swaggerUI, SwaggerUI } from "@hono/swagger-ui";
 
 const app = new Hono();
 
 app.use(
   "*",
   cors({
-    origin: "*", // Allow all origins
+    origin: "http://localhost:3000", // Allow specific origin
     allowMethods: ["GET", "POST"], // Allow specific methods
     allowHeaders: ["Content-Type", "Authorization"], // Allow specific headers
   })
@@ -113,5 +114,94 @@ app.post("/api/upload-zip", async (c) => {
 
   return c.json({ jobId: job.id });
 });
+
+// A basic OpenAPI document
+const openApiDoc = {
+  openapi: "3.0.0", // This is the required version field
+  info: {
+    title: "API Documentation For Ai Powered Pair Programmer",
+    version: "1.0.0",
+    description: "This is the API documentation for the Ai Powered Pair Programmer server.",
+  },
+  paths: {
+    // Add your API paths here
+    "/health": {
+      get: {
+        summary: "Health check",
+        responses: {
+          "200": {
+            description: "OK",
+          },
+        },
+      },
+    },
+    // Add more endpoints as needed
+    "/api/github-extract": {
+      post: {
+        summary: "Extract GitHub repository",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  repoUrl: { type: "string" },
+                  branches: { type: "array", items: { type: "string" } },
+                  token: { type: "string" },
+                  repoName: { type: "string" },
+                  userId: { type: "string" },
+                },
+                required: [
+                  "repoUrl",
+                  "branches",
+                  "token",
+                  "repoName",
+                  "userId",
+                ],
+              },
+            },
+          },
+        },
+        responses: {
+          "200": {
+            description: "Job created successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    jobInfo: {
+                      type: "object",
+                      properties: {
+                        status: { type: "string" },
+                        jobId: { type: "string" },
+                      },
+                    },
+                    projectId: { type: "string" },
+                    userId: { type: "string" },
+                  },
+                },
+              },
+            },
+          },
+          "400": {
+            description: "Bad Request",
+          },
+        },
+      },
+    },
+  },
+};
+
+// Serve the OpenAPI document
+app.get("/doc", (c) => c.json(openApiDoc));
+
+app.get("/health", (c) => c.json({ description: "ok" }));
+
+// Use the middleware to serve Swagger UI at /ui
+app.get("/ui", swaggerUI({ url: "/doc" }));
+
+app.get("/health", (c) => c.text("OK"));
 
 export default app;
