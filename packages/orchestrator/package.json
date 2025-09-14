@@ -1,0 +1,11 @@
+{
+  "name": "@ai_pair_programmer/orchestrator",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "main": "containerManager.ts",
+  "publishConfig": {
+    "access": "public"
+  }
+}

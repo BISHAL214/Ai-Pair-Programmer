@@ -1,0 +1,13 @@
+{
+  "name": "@ai_pair_programmer/kafka-producer",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "kafkajs": "^2.2.4"
+  }
+}

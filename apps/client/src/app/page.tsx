@@ -1,17 +1,23 @@
 "use client";
 
-import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-import { useQuery } from "@tanstack/react-query";
-import { extractGithubFiles, fetchGitHubBranches, fetchGitHubRepos } from "@/lib/github";
+import { useProjectSocket } from "@/hooks/use-projectSocket";
+import { useAuth } from "@/lib/auth";
+import {
+  extractGithubFiles,
+  fetchGitHubBranches,
+  fetchGitHubRepos,
+} from "@/lib/github";
 import { handleZipUpload } from "@/lib/upload-zip";
+import { INFO, useProjectStore } from "@/zustand/useProjectStore";
+import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function Page() {
   const { user, loading, supabase, session } = useAuth();
@@ -21,8 +27,15 @@ export default function Page() {
   const [selectedRepo, setSelectedRepo] = useState<any | null>(null);
   const [selectedBranches, setSelectedBranches] = useState<string[]>([]);
   const [isTheChatStarted, setIsTheChatStarted] = useState(false);
-  const [projectSourceType, setProjectSourceType] = useState<"github" | "zip" | "">("");
-  const [zipUploadFormData, setZipUploadFormData] = useState<FormData | null>(null);
+  const [projectSourceType, setProjectSourceType] = useState<
+    "github" | "zip" | ""
+  >("");
+  const [zipUploadFormData, setZipUploadFormData] = useState<FormData | null>(
+    null
+  );
+
+  const { setProjectUserId, setInfo, info } = useProjectStore();
+  useProjectSocket();
 
   // ✅ Safe query for GitHub repos
   const { data: repos = [] } = useQuery({
@@ -39,18 +52,52 @@ export default function Page() {
       fetchGitHubBranches(
         githubToken!,
         selectedRepo?.owner?.login,
-        selectedRepo?.name,
+        selectedRepo?.name
       ),
     enabled: !!githubToken && !!selectedRepo,
     staleTime: 1000 * 60 * 5,
   });
 
-  const { data: extractJob } = useQuery({
+  const { data: extractJob } = useQuery<{
+    jobInfo: INFO["extraction"] | null;
+    projectId: string | null;
+    userId: string | null;
+  }>({
     queryKey: ["githubExtractJob", selectedRepo?.name, selectedBranches],
-    queryFn: () => extractGithubFiles(selectedRepo?.clone_url, selectedRepo?.name, user?.id as string, selectedBranches, githubToken!),
+    queryFn: () =>
+      extractGithubFiles(
+        selectedRepo?.clone_url,
+        selectedRepo?.name,
+        user?.id as string,
+        selectedBranches,
+        githubToken!
+      ),
     enabled: isTheChatStarted && projectSourceType === "github",
     staleTime: 1000 * 60 * 5,
-  })
+  });
+
+  // add the extractJob's data in the zustand store
+  useEffect(() => {
+    if (extractJob) {
+      setProjectUserId(
+        extractJob.userId as string,
+        extractJob.projectId as string
+      );
+      setInfo("extraction", extractJob.jobInfo as INFO["extraction"]);
+    }
+  }, [extractJob, setProjectUserId, setInfo]);
+
+  useEffect(() => {
+    if (info.extraction) {
+      console.log("Extraction Info Updated:", info.extraction);
+    }
+    if (info.container) {
+      console.log("Container Info Updated:", info.container);
+    }
+    if (info.fileSync) {
+      console.log("File Sync Info Updated:", info.fileSync);
+    }
+  }, [info.extraction, info.container, info.fileSync]);
 
   const handleLogout = () => {
     supabase.auth.signOut();
@@ -70,7 +117,7 @@ export default function Page() {
     setSelectedBranches((prev) =>
       prev.includes(branch)
         ? prev.filter((b) => b !== branch)
-        : [...prev, branch],
+        : [...prev, branch]
     );
   };
 
@@ -87,14 +134,17 @@ export default function Page() {
       setZipUploadFormData(null);
     }
     setIsTheChatStarted(true);
-  }
+  };
 
-  const handleZipInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleZipInputChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = e.target.files?.[0];
-    console.log(file)
+    console.log(file);
     if (
       !file ||
-      (file.type !== "application/zip" && file.type !== "application/x-zip-compressed")
+      (file.type !== "application/zip" &&
+        file.type !== "application/x-zip-compressed")
     ) {
       alert("Please upload a zip file");
       return;
@@ -105,7 +155,7 @@ export default function Page() {
     formData.append("userId", user?.id!);
     formData.append("projectName", file.name.replace(".zip", ""));
     setZipUploadFormData(formData);
-  }
+  };
 
   // console.log(githubToken)
   // console.log("Selected Repo:", selectedRepo);
@@ -145,7 +195,12 @@ export default function Page() {
             />
             <div className="flex gap-4">
               <Button onClick={handleChatStarted}>Send</Button>
-              <Input onChange={handleZipInputChange} type="file" accept=".zip" className="cursor-pointer" />
+              <Input
+                onChange={handleZipInputChange}
+                type="file"
+                accept=".zip"
+                className="cursor-pointer"
+              />
             </div>
 
             {!isGitHubConnected ? (

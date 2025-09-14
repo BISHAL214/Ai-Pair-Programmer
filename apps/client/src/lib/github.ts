@@ -70,13 +70,16 @@ export const extractGithubFiles = async (
   token: string
 ) => {
   try {
-    const response = await axios.post(`${serverUrl}/github-extract`, {
-      repoUrl,
-      repoName,
-      userId,
-      branches,
-      token,
-    });
+    const response = await axios.post(
+      `${serverUrl}/github-extract`,
+      {
+        repoUrl,
+        repoName,
+        userId,
+        branches,
+        token,
+      },
+    );
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {

@@ -9,6 +9,8 @@ import * as os from "node:os";
 import * as path from "node:path";
 import { simpleGit } from "simple-git";
 import * as unzipper from "unzipper";
+import { produceEvent } from "./inngest/utils/inngestEventProducer";
+import { containerManagerQueue } from "./queue";
 
 const supabase_url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabase_service_role_key = process.env.SERVICE_ROLE_KEY!;
@@ -18,12 +20,55 @@ export const createSupabaseServerClient: SupabaseClient = createClient(
   supabase_service_role_key
 );
 
+// --- Project detection helpers ---
+function detectProjectType(file: string): string | null {
+  const patterns: Record<string, RegExp[]> = {
+    node: [/package\.json$/],
+    python: [/(requirements\.txt|pyproject\.toml|setup\.py)$/],
+    rust: [/Cargo\.toml$/],
+    go: [/go\.mod$/],
+    java: [/pom\.xml$/, /build\.gradle$/],
+    cpp: [/CMakeLists\.txt$/, /\.cpp$/],
+    php: [/composer\.json$/],
+    ruby: [/Gemfile$/],
+  };
+
+  for (const [type, regexes] of Object.entries(patterns)) {
+    if (regexes.some((re) => re.test(file))) return type;
+  }
+  return null;
+}
+
+function mapTypeToTools(type: string): string[] {
+  switch (type) {
+    case "node":
+      return ["nodejs", "npm"];
+    case "python":
+      return ["python3", "pip"];
+    case "rust":
+      return ["rustc", "cargo"];
+    case "go":
+      return ["golang"];
+    case "java":
+      return ["openjdk-17"];
+    case "cpp":
+      return ["g++", "make"];
+    case "php":
+      return ["php"];
+    case "ruby":
+      return ["ruby", "bundler"];
+    default:
+      return [];
+  }
+}
+
 export async function extractFilesFromGitAndUpload(
   repoUrl: string,
   repoName: string,
   userId: string,
   branches: string[],
-  token: string
+  token: string,
+  projectId: string
 ): Promise<void> {
   const jobId = crypto.randomUUID();
   const baseDir = path.join(os.tmpdir(), `git-job-${jobId}`);
@@ -31,18 +76,21 @@ export async function extractFilesFromGitAndUpload(
 
   try {
     const git = simpleGit();
-    const newProject = await db
-      .insert(schema.projects)
-      .values({
-        name: repoName,
-        userId: userId,
-        sourceType: "github",
-        githubUrl: repoUrl,
-      })
-      .returning({ projectId: schema.projects.id });
-    const projectId = newProject[0].projectId;
+    // const newProject = await db
+    //   .insert(schema.projects)
+    //   .values({
+    //     name: repoName,
+    //     userId: userId,
+    //     sourceType: "github",
+    //     githubUrl: repoUrl,
+    //   })
+    //   .returning({ projectId: schema.projects.id });
+    // const projectId = newProject[0].projectId;
 
     await git.clone(repoWithAuth, baseDir);
+    let supaPath = "";
+    const detectedTypes = new Set<string>();
+    const detectedTools = new Set<string>();
 
     for (const branch of branches) {
       const branchGit = simpleGit(baseDir);
@@ -54,7 +102,7 @@ export async function extractFilesFromGitAndUpload(
         const absPath = path.join(baseDir, relativePath);
         const content = await fs.readFile(absPath, "utf8");
         const extension = path.extname(relativePath).slice(1);
-        const supaPath = `projects/${projectId}/${branch}/${relativePath}`;
+        supaPath = `projects/${projectId}/${branch}/${relativePath}`;
 
         // Upload to Supabase Storage
         await createSupabaseServerClient.storage
@@ -89,8 +137,45 @@ export async function extractFilesFromGitAndUpload(
               error
             );
           });
+
+        const detected = detectProjectType(relativePath);
+        if (detected) {
+          detectedTypes.add(detected);
+          const tools = mapTypeToTools(detected);
+          tools.forEach((tool) => detectedTools.add(tool));
+        }
       }
     }
+
+    console.log(
+      `Extraction and upload complete for project ${repoName} from github, branches: ${branches.join(", ")}`
+    );
+    console.log("Detected types:", Array.from(detectedTypes));
+    console.log("Detected tools:", Array.from(detectedTools));
+    console.log("sending job to container manager queue");
+
+    const containerJob = await containerManagerQueue.add("setup-environment", {
+      userId,
+      projectId,
+      template: Array.from(detectedTypes)[0], // Default template, can be enhanced to be dynamic based on detectedTypes
+      cpu: 1,
+      memoryMB: 512,
+    }, { attempts: 3, removeOnComplete: true });
+
+    console.log("sending event to inngest");
+    produceEvent({
+      name: "project_extracted",
+      id: `${userId}:${projectId}:project_extracted`,
+      data: {
+        projectId,
+        userId,
+        supaPath,
+        types: Array.from(detectedTypes),
+        tools: Array.from(detectedTools),
+        monorepo: detectedTypes.size > 1,
+        containerJobId: containerJob.id,
+      },
+    });
   } finally {
     await fs.rm(baseDir, { recursive: true, force: true });
   }
@@ -99,7 +184,8 @@ export async function extractFilesFromGitAndUpload(
 export async function extractFileFromUploadedZip(
   zipPath: string,
   userId: string,
-  projectName: string
+  projectName: string,
+  projectId: string
 ) {
   const tmpDir = path.join(os.tmpdir(), `unzipped-${crypto.randomUUID()}`);
 
@@ -126,24 +212,25 @@ export async function extractFileFromUploadedZip(
       })
     );
 
-    const newProject = await db
-      .insert(schema.projects)
-      .values({
-        name: projectName,
-        userId,
-        sourceType: "zip",
-      })
-      .returning({ projectId: schema.projects.id });
+    // const newProject = await db
+    //   .insert(schema.projects)
+    //   .values({
+    //     name: projectName,
+    //     userId,
+    //     sourceType: "zip",
+    //   })
+    //   .returning({ projectId: schema.projects.id });
 
-    const projectId = newProject[0].projectId;
+    // const projectId = newProject[0].projectId;
 
     const files = await walkFiles(tmpDir, tmpDir);
+    let supaPath = "";
 
     for (const relativePath of files) {
       const absPath = path.join(tmpDir, relativePath);
       const content = await fs.readFile(absPath, "utf8");
       const extension = path.extname(relativePath).slice(1);
-      const supaPath = `projects/${projectName}/zip/${relativePath}`;
+      supaPath = `projects/${projectName}/zip/${relativePath}`;
 
       // Upload to Supabase Storage
       try {
@@ -171,6 +258,21 @@ export async function extractFileFromUploadedZip(
         console.error(`❌ Failed to insert ${relativePath} into DB:`, error);
       }
     }
+
+    console.log(
+      `Extraction and upload complete for project ${projectName} from zip`
+    );
+    console.log("sending event to inngest");
+
+    produceEvent({
+      name: "project_extracted",
+      id: `${userId}:${projectId}:project_extracted`,
+      data: {
+        projectId,
+        userId,
+        supaPath,
+      },
+    });
   } catch (error) {
     console.error("❌ Error extracting files from zip:", error);
     throw error;

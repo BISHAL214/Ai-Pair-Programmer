@@ -1,0 +1,316 @@
+2025/09/12 17:46:45 [notice] 1#1: using the "epoll" event method
+2025/09/12 17:46:45 [notice] 1#1: nginx/1.28.0
+2025/09/12 17:46:45 [notice] 1#1: built by gcc 12.2.0 (Debian 12.2.0-14) 
+2025/09/12 17:46:45 [notice] 1#1: OS: Linux 6.16.4-arch1-1
+2025/09/12 17:46:45 [notice] 1#1: getrlimit(RLIMIT_NOFILE): 1024:524288
+2025/09/12 17:46:45 [notice] 1#1: start worker processes
+2025/09/12 17:46:45 [notice] 1#1: start worker process 20
+2025/09/12 17:46:45 [notice] 1#1: start worker process 21
+2025/09/12 17:46:45 [notice] 1#1: start worker process 22
+2025/09/12 17:46:45 [notice] 1#1: start worker process 23
+2025/09/12 17:46:45 [notice] 1#1: start worker process 24
+2025/09/12 17:46:45 [notice] 1#1: start worker process 25
+2025/09/12 17:46:45 [notice] 1#1: start worker process 26
+2025/09/12 17:46:45 [notice] 1#1: start worker process 27
+2025/09/12 17:46:45 [notice] 1#1: start worker process 28
+2025/09/12 17:46:45 [notice] 1#1: start worker process 29
+2025/09/12 17:46:45 [notice] 1#1: start worker process 30
+2025/09/12 17:46:45 [notice] 1#1: start worker process 31
+2025/09/12 17:54:57 [emerg] 32#32: unknown directive "cat" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:2
+2025/09/12 17:55:07 [emerg] 38#38: unexpected end of file, expecting ";" or "}" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:17
+2025/09/12 17:55:25 [notice] 44#44: signal process started
+2025/09/12 17:55:25 [notice] 1#1: signal 1 (SIGHUP) received from 44, reconfiguring
+2025/09/12 17:55:25 [notice] 1#1: reconfiguring
+2025/09/12 17:55:25 [notice] 1#1: using the "epoll" event method
+2025/09/12 17:55:25 [notice] 1#1: start worker processes
+2025/09/12 17:55:25 [notice] 1#1: start worker process 50
+2025/09/12 17:55:25 [notice] 1#1: start worker process 51
+2025/09/12 17:55:25 [notice] 1#1: start worker process 52
+2025/09/12 17:55:25 [notice] 1#1: start worker process 53
+2025/09/12 17:55:25 [notice] 1#1: start worker process 54
+2025/09/12 17:55:25 [notice] 1#1: start worker process 55
+2025/09/12 17:55:25 [notice] 1#1: start worker process 56
+2025/09/12 17:55:25 [notice] 1#1: start worker process 57
+2025/09/12 17:55:25 [notice] 1#1: start worker process 58
+2025/09/12 17:55:25 [notice] 1#1: start worker process 59
+2025/09/12 17:55:25 [notice] 1#1: start worker process 60
+2025/09/12 17:55:25 [notice] 1#1: start worker process 61
+2025/09/12 17:55:25 [notice] 20#20: gracefully shutting down
+2025/09/12 17:55:25 [notice] 21#21: gracefully shutting down
+2025/09/12 17:55:25 [notice] 25#25: gracefully shutting down
+2025/09/12 17:55:25 [notice] 23#23: gracefully shutting down
+2025/09/12 17:55:25 [notice] 22#22: gracefully shutting down
+2025/09/12 17:55:25 [notice] 24#24: gracefully shutting down
+2025/09/12 17:55:25 [notice] 26#26: gracefully shutting down
+2025/09/12 17:55:25 [notice] 27#27: gracefully shutting down
+2025/09/12 17:55:25 [notice] 28#28: gracefully shutting down
+2025/09/12 17:55:25 [notice] 29#29: gracefully shutting down
+2025/09/12 17:55:25 [notice] 30#30: gracefully shutting down
+2025/09/12 17:55:25 [notice] 31#31: gracefully shutting down
+2025/09/12 17:55:25 [notice] 20#20: exiting
+2025/09/12 17:55:25 [notice] 21#21: exiting
+2025/09/12 17:55:25 [notice] 25#25: exiting
+2025/09/12 17:55:25 [notice] 21#21: exit
+2025/09/12 17:55:25 [notice] 23#23: exiting
+2025/09/12 17:55:25 [notice] 22#22: exiting
+2025/09/12 17:55:25 [notice] 23#23: exit
+2025/09/12 17:55:25 [notice] 24#24: exiting
+2025/09/12 17:55:25 [notice] 26#26: exiting
+2025/09/12 17:55:25 [notice] 27#27: exiting
+2025/09/12 17:55:25 [notice] 26#26: exit
+2025/09/12 17:55:25 [notice] 28#28: exiting
+2025/09/12 17:55:25 [notice] 29#29: exiting
+2025/09/12 17:55:25 [notice] 28#28: exit
+2025/09/12 17:55:25 [notice] 30#30: exiting
+2025/09/12 17:55:25 [notice] 31#31: exiting
+2025/09/12 17:55:25 [notice] 20#20: exit
+2025/09/12 17:55:25 [notice] 25#25: exit
+2025/09/12 17:55:25 [notice] 22#22: exit
+2025/09/12 17:55:25 [notice] 24#24: exit
+2025/09/12 17:55:25 [notice] 27#27: exit
+2025/09/12 17:55:25 [notice] 29#29: exit
+2025/09/12 17:55:25 [notice] 30#30: exit
+2025/09/12 17:55:25 [notice] 31#31: exit
+2025/09/12 17:55:25 [notice] 1#1: signal 17 (SIGCHLD) received from 25
+2025/09/12 17:55:25 [notice] 1#1: worker process 20 exited with code 0
+2025/09/12 17:55:25 [notice] 1#1: worker process 22 exited with code 0
+2025/09/12 17:55:25 [notice] 1#1: worker process 24 exited with code 0
+2025/09/12 17:55:25 [notice] 1#1: worker process 25 exited with code 0
+2025/09/12 17:55:25 [notice] 1#1: worker process 26 exited with code 0
+2025/09/12 17:55:25 [notice] 1#1: worker process 28 exited with code 0
+2025/09/12 17:55:25 [notice] 1#1: worker process 31 exited with code 0
+2025/09/12 17:55:25 [notice] 1#1: signal 29 (SIGIO) received
+2025/09/12 17:55:25 [notice] 1#1: signal 17 (SIGCHLD) received from 31
+2025/09/12 17:55:25 [notice] 1#1: signal 17 (SIGCHLD) received from 29
+2025/09/12 17:55:25 [notice] 1#1: worker process 21 exited with code 0
+2025/09/12 17:55:25 [notice] 1#1: worker process 23 exited with code 0
+2025/09/12 17:55:25 [notice] 1#1: worker process 27 exited with code 0
+2025/09/12 17:55:25 [notice] 1#1: worker process 29 exited with code 0
+2025/09/12 17:55:25 [notice] 1#1: signal 29 (SIGIO) received
+2025/09/12 17:55:25 [notice] 1#1: signal 17 (SIGCHLD) received from 30
+2025/09/12 17:55:25 [notice] 1#1: worker process 30 exited with code 0
+2025/09/12 17:55:25 [notice] 1#1: signal 29 (SIGIO) received
+2025/09/12 17:55:27 [notice] 62#62: signal process started
+2025/09/12 17:55:27 [notice] 1#1: signal 1 (SIGHUP) received from 62, reconfiguring
+2025/09/12 17:55:27 [notice] 1#1: reconfiguring
+2025/09/12 17:55:27 [notice] 1#1: using the "epoll" event method
+2025/09/12 17:55:27 [notice] 1#1: start worker processes
+2025/09/12 17:55:27 [notice] 1#1: start worker process 68
+2025/09/12 17:55:27 [notice] 1#1: start worker process 69
+2025/09/12 17:55:27 [notice] 1#1: start worker process 70
+2025/09/12 17:55:27 [notice] 1#1: start worker process 71
+2025/09/12 17:55:27 [notice] 1#1: start worker process 72
+2025/09/12 17:55:27 [notice] 1#1: start worker process 73
+2025/09/12 17:55:27 [notice] 1#1: start worker process 74
+2025/09/12 17:55:27 [notice] 1#1: start worker process 75
+2025/09/12 17:55:27 [notice] 1#1: start worker process 76
+2025/09/12 17:55:27 [notice] 1#1: start worker process 77
+2025/09/12 17:55:27 [notice] 1#1: start worker process 78
+2025/09/12 17:55:27 [notice] 1#1: start worker process 79
+2025/09/12 17:55:27 [notice] 53#53: gracefully shutting down
+2025/09/12 17:55:27 [notice] 53#53: exiting
+2025/09/12 17:55:27 [notice] 50#50: gracefully shutting down
+2025/09/12 17:55:27 [notice] 50#50: exiting
+2025/09/12 17:55:27 [notice] 52#52: gracefully shutting down
+2025/09/12 17:55:27 [notice] 50#50: exit
+2025/09/12 17:55:27 [notice] 51#51: gracefully shutting down
+2025/09/12 17:55:27 [notice] 54#54: gracefully shutting down
+2025/09/12 17:55:27 [notice] 56#56: gracefully shutting down
+2025/09/12 17:55:27 [notice] 57#57: gracefully shutting down
+2025/09/12 17:55:27 [notice] 57#57: exiting
+2025/09/12 17:55:27 [notice] 55#55: gracefully shutting down
+2025/09/12 17:55:27 [notice] 57#57: exit
+2025/09/12 17:55:27 [notice] 59#59: gracefully shutting down
+2025/09/12 17:55:27 [notice] 58#58: gracefully shutting down
+2025/09/12 17:55:27 [notice] 61#61: gracefully shutting down
+2025/09/12 17:55:27 [notice] 61#61: exiting
+2025/09/12 17:55:27 [notice] 60#60: gracefully shutting down
+2025/09/12 17:55:27 [notice] 60#60: exiting
+2025/09/12 17:55:27 [notice] 53#53: exit
+2025/09/12 17:55:27 [notice] 52#52: exiting
+2025/09/12 17:55:27 [notice] 51#51: exiting
+2025/09/12 17:55:27 [notice] 54#54: exiting
+2025/09/12 17:55:27 [notice] 56#56: exiting
+2025/09/12 17:55:27 [notice] 55#55: exiting
+2025/09/12 17:55:27 [notice] 59#59: exiting
+2025/09/12 17:55:27 [notice] 58#58: exiting
+2025/09/12 17:55:27 [notice] 61#61: exit
+2025/09/12 17:55:27 [notice] 60#60: exit
+2025/09/12 17:55:27 [notice] 52#52: exit
+2025/09/12 17:55:27 [notice] 51#51: exit
+2025/09/12 17:55:27 [notice] 54#54: exit
+2025/09/12 17:55:27 [notice] 56#56: exit
+2025/09/12 17:55:27 [notice] 55#55: exit
+2025/09/12 17:55:27 [notice] 59#59: exit
+2025/09/12 17:55:27 [notice] 58#58: exit
+2025/09/12 17:55:27 [notice] 1#1: signal 17 (SIGCHLD) received from 56
+2025/09/12 17:55:27 [notice] 1#1: worker process 53 exited with code 0
+2025/09/12 17:55:27 [notice] 1#1: worker process 56 exited with code 0
+2025/09/12 17:55:27 [notice] 1#1: signal 29 (SIGIO) received
+2025/09/12 17:55:27 [notice] 1#1: signal 17 (SIGCHLD) received from 61
+2025/09/12 17:55:27 [notice] 1#1: worker process 57 exited with code 0
+2025/09/12 17:55:27 [notice] 1#1: worker process 61 exited with code 0
+2025/09/12 17:55:27 [notice] 1#1: signal 29 (SIGIO) received
+2025/09/12 17:55:27 [notice] 1#1: signal 17 (SIGCHLD) received from 52
+2025/09/12 17:55:27 [notice] 1#1: worker process 52 exited with code 0
+2025/09/12 17:55:27 [notice] 1#1: signal 29 (SIGIO) received
+2025/09/12 17:55:27 [notice] 1#1: signal 17 (SIGCHLD) received from 50
+2025/09/12 17:55:27 [notice] 1#1: worker process 50 exited with code 0
+2025/09/12 17:55:27 [notice] 1#1: worker process 51 exited with code 0
+2025/09/12 17:55:27 [notice] 1#1: worker process 59 exited with code 0
+2025/09/12 17:55:27 [notice] 1#1: worker process 60 exited with code 0
+2025/09/12 17:55:27 [notice] 1#1: signal 29 (SIGIO) received
+2025/09/12 17:55:27 [notice] 1#1: signal 17 (SIGCHLD) received from 59
+2025/09/12 17:55:27 [notice] 1#1: worker process 54 exited with code 0
+2025/09/12 17:55:27 [notice] 1#1: worker process 58 exited with code 0
+2025/09/12 17:55:27 [notice] 1#1: signal 29 (SIGIO) received
+2025/09/12 17:55:27 [notice] 1#1: signal 17 (SIGCHLD) received from 55
+2025/09/12 17:55:27 [notice] 1#1: worker process 55 exited with code 0
+2025/09/12 17:55:27 [notice] 1#1: signal 29 (SIGIO) received
+2025/09/12 18:11:48 [error] 74#74: *39 connect() failed (113: No route to host) while connecting to upstream, client: 172.18.0.1, server: foo-3000.localhost, request: "GET / HTTP/1.1", upstream: "http://172.18.0.3:3000/", host: "foo-3000.localhost"
+2025/09/12 18:11:52 [error] 74#74: *39 connect() failed (113: No route to host) while connecting to upstream, client: 172.18.0.1, server: foo-3000.localhost, request: "GET /favicon.ico HTTP/1.1", upstream: "http://172.18.0.3:3000/favicon.ico", host: "foo-3000.localhost", referrer: "http://foo-3000.localhost/"
+2025/09/12 20:38:36 [notice] 1#1: signal 3 (SIGQUIT) received, shutting down
+2025/09/12 20:38:36 [notice] 70#70: gracefully shutting down
+2025/09/12 20:38:36 [notice] 68#68: gracefully shutting down
+2025/09/12 20:38:36 [notice] 71#71: gracefully shutting down
+2025/09/12 20:38:36 [notice] 69#69: gracefully shutting down
+2025/09/12 20:38:36 [notice] 75#75: gracefully shutting down
+2025/09/12 20:38:36 [notice] 76#76: gracefully shutting down
+2025/09/12 20:38:36 [notice] 74#74: gracefully shutting down
+2025/09/12 20:38:36 [notice] 72#72: gracefully shutting down
+2025/09/12 20:38:36 [notice] 73#73: gracefully shutting down
+2025/09/12 20:38:36 [notice] 77#77: gracefully shutting down
+2025/09/12 20:38:36 [notice] 77#77: exiting
+2025/09/12 20:38:36 [notice] 78#78: gracefully shutting down
+2025/09/12 20:38:36 [notice] 78#78: exiting
+2025/09/12 20:38:36 [notice] 79#79: gracefully shutting down
+2025/09/12 20:38:36 [notice] 78#78: exit
+2025/09/12 20:38:36 [notice] 70#70: exiting
+2025/09/12 20:38:36 [notice] 70#70: exit
+2025/09/12 20:38:36 [notice] 68#68: exiting
+2025/09/12 20:38:36 [notice] 71#71: exiting
+2025/09/12 20:38:36 [notice] 71#71: exit
+2025/09/12 20:38:36 [notice] 69#69: exiting
+2025/09/12 20:38:36 [notice] 75#75: exiting
+2025/09/12 20:38:36 [notice] 76#76: exiting
+2025/09/12 20:38:36 [notice] 74#74: exiting
+2025/09/12 20:38:36 [notice] 72#72: exiting
+2025/09/12 20:38:36 [notice] 73#73: exiting
+2025/09/12 20:38:36 [notice] 77#77: exit
+2025/09/12 20:38:36 [notice] 79#79: exiting
+2025/09/12 20:38:36 [notice] 68#68: exit
+2025/09/12 20:38:36 [notice] 79#79: exit
+2025/09/12 20:38:36 [notice] 69#69: exit
+2025/09/12 20:38:36 [notice] 75#75: exit
+2025/09/12 20:38:36 [notice] 76#76: exit
+2025/09/12 20:38:36 [notice] 74#74: exit
+2025/09/12 20:38:36 [notice] 72#72: exit
+2025/09/12 20:38:36 [notice] 73#73: exit
+2025/09/12 20:38:36 [notice] 1#1: signal 17 (SIGCHLD) received from 70
+2025/09/12 20:38:36 [notice] 1#1: worker process 70 exited with code 0
+2025/09/12 20:38:36 [notice] 1#1: signal 29 (SIGIO) received
+2025/09/12 20:38:36 [notice] 1#1: signal 17 (SIGCHLD) received from 79
+2025/09/12 20:38:36 [notice] 1#1: worker process 71 exited with code 0
+2025/09/12 20:38:36 [notice] 1#1: worker process 79 exited with code 0
+2025/09/12 20:38:36 [notice] 1#1: worker process 78 exited with code 0
+2025/09/12 20:38:36 [notice] 1#1: signal 29 (SIGIO) received
+2025/09/12 20:38:36 [notice] 1#1: signal 17 (SIGCHLD) received from 71
+2025/09/12 20:38:36 [notice] 1#1: signal 17 (SIGCHLD) received from 73
+2025/09/12 20:38:36 [notice] 1#1: worker process 68 exited with code 0
+2025/09/12 20:38:36 [notice] 1#1: worker process 73 exited with code 0
+2025/09/12 20:38:36 [notice] 1#1: signal 29 (SIGIO) received
+2025/09/12 20:38:36 [notice] 1#1: signal 17 (SIGCHLD) received from 68
+2025/09/12 20:38:36 [notice] 1#1: worker process 69 exited with code 0
+2025/09/12 20:38:36 [notice] 1#1: worker process 74 exited with code 0
+2025/09/12 20:38:36 [notice] 1#1: worker process 76 exited with code 0
+2025/09/12 20:38:36 [notice] 1#1: worker process 77 exited with code 0
+2025/09/12 20:38:36 [notice] 1#1: signal 29 (SIGIO) received
+2025/09/12 20:38:36 [notice] 1#1: signal 17 (SIGCHLD) received from 69
+2025/09/12 20:38:36 [notice] 1#1: signal 17 (SIGCHLD) received from 72
+2025/09/12 20:38:36 [notice] 1#1: worker process 72 exited with code 0
+2025/09/12 20:38:36 [notice] 1#1: signal 29 (SIGIO) received
+2025/09/12 20:38:36 [notice] 1#1: signal 17 (SIGCHLD) received from 75
+2025/09/12 20:38:36 [notice] 1#1: worker process 75 exited with code 0
+2025/09/12 20:38:36 [notice] 1#1: exit
+2025/09/14 09:10:47 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:12:02 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:13:58 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:14:19 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:15:14 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:15:25 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:20:18 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:20:18 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:20:19 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:20:20 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:20:21 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:20:23 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:20:26 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:20:33 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:20:46 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:21:12 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:22:04 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:23:04 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:24:04 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:25:05 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:26:05 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:27:05 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:28:06 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:29:06 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:30:11 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:31:11 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:32:11 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:33:12 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:34:16 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:35:17 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:36:17 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:37:18 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:38:18 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:39:18 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:40:20 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:41:21 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:42:21 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:43:21 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:44:22 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:45:23 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:46:23 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:47:24 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:48:29 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:49:29 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:50:31 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:51:32 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:52:32 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:53:33 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:54:33 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:55:34 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:56:39 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:57:39 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:58:44 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 09:59:47 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 10:00:47 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 10:01:47 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 10:02:48 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 10:03:52 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 10:04:53 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 10:05:54 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 10:06:58 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 10:07:58 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 10:08:59 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 10:10:00 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 10:11:01 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 10:12:05 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 10:13:06 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 10:14:07 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 10:15:09 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 10:16:09 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 10:17:10 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 10:18:12 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 10:19:12 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 10:20:12 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 10:21:13 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 10:22:13 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 10:23:14 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 10:24:14 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 10:25:18 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 10:26:19 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 10:27:19 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
+2025/09/14 10:28:20 [emerg] 1#1: host not found in upstream "aipp-bishal-foo" in /etc/nginx/conf.d/aipp-bishal-foo-3000.conf:7
