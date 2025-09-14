@@ -2,12 +2,13 @@
 
 import { useAuth } from "@/lib/auth";
 import { INFO, useProjectStore } from "@/zustand/useProjectStore";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
 
 const SOCKET_SERVER_URL =
   process.env.NEXT_PUBLIC_SOCKET_SERVER_URL || "http://localhost:3001";
 
+// Custom hook to manage project-related WebSocket connections and events
 export function useProjectSocket() {
   const socketRef = useRef<Socket | null>(null);
   const { user } = useAuth();

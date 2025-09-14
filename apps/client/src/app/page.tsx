@@ -17,9 +17,12 @@ import { handleZipUpload } from "@/lib/upload-zip";
 import { INFO, useProjectStore } from "@/zustand/useProjectStore";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Page() {
+  const router = useRouter();
   const { user, loading, supabase, session } = useAuth();
   const githubToken = session?.provider_token ?? null;
   const isGitHubConnected = !!githubToken;
@@ -34,10 +37,10 @@ export default function Page() {
     null
   );
 
-  const { setProjectUserId, setInfo, info } = useProjectStore();
+  const { setProjectUserId, setInfo, info, projectId } = useProjectStore();
   useProjectSocket();
 
-  // ✅ Safe query for GitHub repos
+  // ✅ GitHub repos
   const { data: repos = [] } = useQuery({
     queryKey: ["githubRepos"],
     queryFn: () => fetchGitHubRepos(githubToken!),
@@ -45,7 +48,7 @@ export default function Page() {
     staleTime: 1000 * 60 * 5,
   });
 
-  // ✅ Safe query for branches
+  // ✅ GitHub branches
   const { data: branches = [] } = useQuery({
     queryKey: ["githubBranches", selectedRepo?.full_name],
     queryFn: () =>
@@ -58,6 +61,7 @@ export default function Page() {
     staleTime: 1000 * 60 * 5,
   });
 
+  // ✅ Extraction job
   const { data: extractJob } = useQuery<{
     jobInfo: INFO["extraction"] | null;
     projectId: string | null;
@@ -76,7 +80,7 @@ export default function Page() {
     staleTime: 1000 * 60 * 5,
   });
 
-  // add the extractJob's data in the zustand store
+  // ✅ Update store when job starts
   useEffect(() => {
     if (extractJob) {
       setProjectUserId(
@@ -87,69 +91,88 @@ export default function Page() {
     }
   }, [extractJob, setProjectUserId, setInfo]);
 
-  useEffect(() => {
-    if (info.extraction) {
-      console.log("Extraction Info Updated:", info.extraction);
-    }
-    if (info.container) {
-      console.log("Container Info Updated:", info.container);
-    }
-    if (info.fileSync) {
-      console.log("File Sync Info Updated:", info.fileSync);
-    }
+  // ✅ Define stages
+  const stages = useMemo(
+    () => [
+      {
+        key: "extraction",
+        title: "Extracting Project",
+        subtitle: "Analyzing repository & preparing files...",
+      },
+      {
+        key: "container",
+        title: "Creating Environment",
+        subtitle: "Spinning up Docker container...",
+      },
+      {
+        key: "fileSync",
+        title: "Syncing Files",
+        subtitle: "Finalizing project workspace...",
+      },
+    ],
+    []
+  );
+
+  // ✅ Determine current stage
+  const currentStage = useMemo(() => {
+    if (!info.extraction) return null;
+
+    if (info.fileSync?.status === "completed") return "done";
+    if (info.fileSync) return "fileSync";
+    if (info.container) return "container";
+    return "extraction";
   }, [info.extraction, info.container, info.fileSync]);
 
-  const handleLogout = () => {
-    supabase.auth.signOut();
-  };
+  // ✅ Redirect after completion
+  useEffect(() => {
+    if (currentStage === "done") {
+      const timer = setTimeout(() => {
+        setIsTheChatStarted(false);
+        router.push(`/workspace/${projectId}`);
+      }, 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [currentStage, router, projectId]);
+
+  const handleLogout = () => supabase.auth.signOut();
 
   const handleConnectGitHub = () => {
     supabase.auth.signInWithOAuth({
       provider: "github",
-      options: {
-        scopes: "repo",
-        redirectTo: window.location.origin,
-      },
+      options: { scopes: "repo", redirectTo: window.location.origin },
     });
   };
 
-  const toggleBranch = (branch: string) => {
+  const toggleBranch = (branch: string) =>
     setSelectedBranches((prev) =>
-      prev.includes(branch)
-        ? prev.filter((b) => b !== branch)
-        : [...prev, branch]
+      prev.includes(branch) ? prev.filter((b) => b !== branch) : [...prev, branch]
     );
-  };
 
   const handleChatStarted = async () => {
     if (selectedRepo && selectedBranches.length > 0) {
       setProjectSourceType("github");
     } else {
-      setProjectSourceType("zip");
-      await handleZipUpload(zipUploadFormData!);
       if (!zipUploadFormData) {
         alert("Please upload a zip file");
         return;
       }
+      setProjectSourceType("zip");
+      await handleZipUpload(zipUploadFormData);
       setZipUploadFormData(null);
     }
     setIsTheChatStarted(true);
   };
 
-  const handleZipInputChange = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleZipInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    console.log(file);
     if (
       !file ||
       (file.type !== "application/zip" &&
         file.type !== "application/x-zip-compressed")
     ) {
-      alert("Please upload a zip file");
+      alert("Please upload a valid zip file");
       return;
     }
-
     const formData = new FormData();
     formData.append("zip", file);
     formData.append("userId", user?.id!);
@@ -157,13 +180,28 @@ export default function Page() {
     setZipUploadFormData(formData);
   };
 
-  // console.log(githubToken)
-  // console.log("Selected Repo:", selectedRepo);
-  // console.log("Selected Branches:", selectedBranches);
-
   if (loading) return <p>Loading...</p>;
-  console.log("extractJob:", extractJob);
 
+  // ✅ Animated stages screen
+  if (isTheChatStarted) {
+    if (currentStage === null) {
+      return <StageScreen title="Starting..." subtitle="Preparing project..." />;
+    }
+    if (currentStage === "done") {
+      return (
+        <StageScreen
+          title="Workspace Ready"
+          subtitle="Redirecting to editor..."
+          success
+        />
+      );
+    }
+
+    const stage = stages.find((s) => s.key === currentStage);
+    return <StageScreen title={stage?.title!} subtitle={stage?.subtitle!} />;
+  }
+
+  // ✅ Main UI
   return (
     <div className="min-h-screen flex flex-col">
       {/* Navbar */}
@@ -185,14 +223,11 @@ export default function Page() {
         </div>
       </nav>
 
-      {/* Chat + Upload UI */}
+      {/* Chat + Upload */}
       <main className="flex flex-1 justify-center items-center p-6 bg-gray-50">
         <Card className="w-full max-w-2xl p-4 shadow-lg border rounded-2xl">
           <CardContent className="flex flex-col gap-4">
-            <Textarea
-              placeholder="Type your message here..."
-              className="h-32"
-            />
+            <Textarea placeholder="Type your message here..." className="h-32" />
             <div className="flex gap-4">
               <Button onClick={handleChatStarted}>Send</Button>
               <Input
@@ -226,10 +261,7 @@ export default function Page() {
                     <Label className="mt-4">Select Branches</Label>
                     <div className="flex flex-col gap-1">
                       {branches.map((branch: any) => (
-                        <label
-                          key={branch.name}
-                          className="flex items-center gap-2"
-                        >
+                        <label key={branch.name} className="flex items-center gap-2">
                           <Checkbox
                             checked={selectedBranches.includes(branch.name)}
                             onCheckedChange={() => toggleBranch(branch.name)}
@@ -245,6 +277,43 @@ export default function Page() {
           </CardContent>
         </Card>
       </main>
+    </div>
+  );
+}
+
+/* ✅ Animated Stage Screen Component */
+function StageScreen({
+  title,
+  subtitle,
+  success = false,
+}: {
+  title: string;
+  subtitle: string;
+  success?: boolean;
+}) {
+  return (
+    <div className="h-screen flex justify-center items-center bg-gray-50">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={title}
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -15 }}
+          transition={{ duration: 0.5 }}
+          className="text-center"
+        >
+          <motion.h2
+            className={`text-2xl font-bold ${
+              success ? "text-green-600" : "text-gray-800"
+            }`}
+            animate={{ scale: [1, 1.05, 1] }}
+            transition={{ repeat: success ? 0 : Infinity, duration: 2 }}
+          >
+            {title}
+          </motion.h2>
+          <p className="mt-2 text-gray-500">{subtitle}</p>
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 }
