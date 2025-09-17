@@ -20,6 +20,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { NavigationBar } from "@/components/asternity/navbar";
 
 export default function Page() {
   const router = useRouter();
@@ -39,6 +40,8 @@ export default function Page() {
 
   const { setProjectUserId, setInfo, info, projectId } = useProjectStore();
   useProjectSocket();
+
+  const handleLogout = () => supabase.auth.signOut();
 
   // ✅ GitHub repos
   const { data: repos = [] } = useQuery({
@@ -134,8 +137,6 @@ export default function Page() {
     }
   }, [currentStage, router, projectId]);
 
-  const handleLogout = () => supabase.auth.signOut();
-
   const handleConnectGitHub = () => {
     supabase.auth.signInWithOAuth({
       provider: "github",
@@ -145,7 +146,9 @@ export default function Page() {
 
   const toggleBranch = (branch: string) =>
     setSelectedBranches((prev) =>
-      prev.includes(branch) ? prev.filter((b) => b !== branch) : [...prev, branch]
+      prev.includes(branch)
+        ? prev.filter((b) => b !== branch)
+        : [...prev, branch]
     );
 
   const handleChatStarted = async () => {
@@ -185,7 +188,9 @@ export default function Page() {
   // ✅ Animated stages screen
   if (isTheChatStarted) {
     if (currentStage === null) {
-      return <StageScreen title="Starting..." subtitle="Preparing project..." />;
+      return (
+        <StageScreen title="Starting..." subtitle="Preparing project..." />
+      );
     }
     if (currentStage === "done") {
       return (
@@ -203,31 +208,17 @@ export default function Page() {
 
   // ✅ Main UI
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Navbar */}
-      <nav className="w-full px-6 py-4 bg-gray-100 flex justify-between items-center border-b">
-        <h1 className="text-xl font-bold">My AI App</h1>
-        <div className="flex gap-4 items-center">
-          {!user ? (
-            <Button>
-              <Link href="/auth">Login</Link>
-            </Button>
-          ) : (
-            <>
-              <span className="text-sm">Welcome, {user.email}</span>
-              <Button variant="outline" onClick={handleLogout}>
-                Logout
-              </Button>
-            </>
-          )}
-        </div>
-      </nav>
+    <div className="min-h-[400vh] relative flex flex-col">
+      <NavigationBar user={user} handleLogout={handleLogout} />
 
       {/* Chat + Upload */}
-      <main className="flex flex-1 justify-center items-center p-6 bg-gray-50">
+      <main className="flex flex-1 justify-center items-center p-6 bg-gray-800">
         <Card className="w-full max-w-2xl p-4 shadow-lg border rounded-2xl">
           <CardContent className="flex flex-col gap-4">
-            <Textarea placeholder="Type your message here..." className="h-32" />
+            <Textarea
+              placeholder="Type your message here..."
+              className="h-32"
+            />
             <div className="flex gap-4">
               <Button onClick={handleChatStarted}>Send</Button>
               <Input
@@ -261,7 +252,10 @@ export default function Page() {
                     <Label className="mt-4">Select Branches</Label>
                     <div className="flex flex-col gap-1">
                       {branches.map((branch: any) => (
-                        <label key={branch.name} className="flex items-center gap-2">
+                        <label
+                          key={branch.name}
+                          className="flex items-center gap-2"
+                        >
                           <Checkbox
                             checked={selectedBranches.includes(branch.name)}
                             onCheckedChange={() => toggleBranch(branch.name)}
@@ -316,4 +310,27 @@ function StageScreen({
       </AnimatePresence>
     </div>
   );
+}
+
+{
+  /* Navbar */
+}
+{
+  /* <nav className="w-full px-6 py-4 bg-gray-700 flex justify-between items-center border-b">
+        <h1 className="text-xl font-bold">My AI App</h1>
+        <div className="flex gap-4 items-center">
+          {!user ? (
+            <Button>
+              <Link href="/auth">Login</Link>
+            </Button>
+          ) : (
+            <>
+              <span className="text-sm">Welcome, {user.email}</span>
+              <Button variant="outline" onClick={handleLogout}>
+                Logout
+              </Button>
+            </>
+          )}
+        </div>
+      </nav> */
 }
