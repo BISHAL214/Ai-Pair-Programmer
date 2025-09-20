@@ -21,6 +21,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { NavigationBar } from "@/components/asternity/navbar";
+import { BackgroundBeams } from "@/components/asternity/background-beams";
 
 export default function Page() {
   const router = useRouter();
@@ -30,7 +31,7 @@ export default function Page() {
 
   const [selectedRepo, setSelectedRepo] = useState<any | null>(null);
   const [selectedBranches, setSelectedBranches] = useState<string[]>([]);
-  const [isTheChatStarted, setIsTheChatStarted] = useState(false);
+  const [isTheChatStarted, setIsTheChatStarted] = useState(true);
   const [projectSourceType, setProjectSourceType] = useState<
     "github" | "zip" | ""
   >("");
@@ -42,6 +43,8 @@ export default function Page() {
   useProjectSocket();
 
   const handleLogout = () => supabase.auth.signOut();
+
+  console.log(session);
 
   // ✅ GitHub repos
   const { data: repos = [] } = useQuery({
@@ -112,23 +115,41 @@ export default function Page() {
         title: "Syncing Files",
         subtitle: "Finalizing project workspace...",
       },
+      {
+        key: "done",
+        title: "All Set!",
+        subtitle: "Redirecting to your workspace...",
+      },
     ],
     []
   );
+  const [stageIndex, setStageIndex] = useState(0);
+  // ⏳ Fake progression using setTimeout
+  useEffect(() => {
+    if (stageIndex < stages.length - 1) {
+      const timer = setTimeout(() => {
+        setStageIndex((prev) => prev + 1);
+      }, 40000); // change stage every 2s
+
+      return () => clearTimeout(timer);
+    }
+  }, [stageIndex]);
 
   // ✅ Determine current stage
+  // const currentStage = useMemo(() => {
+  //   if (!info.extraction) return null;
+
+  //   if (info.fileSync?.status === "completed") return "done";
+  //   if (info.fileSync) return "fileSync";
+  //   if (info.container) return "container";
+  //   return "extraction";
+  // }, [info.extraction, info.container, info.fileSync]);
   const currentStage = useMemo(() => {
-    if (!info.extraction) return null;
-
-    if (info.fileSync?.status === "completed") return "done";
-    if (info.fileSync) return "fileSync";
-    if (info.container) return "container";
-    return "extraction";
-  }, [info.extraction, info.container, info.fileSync]);
-
+    return stages[stageIndex];
+  }, [stageIndex]);
   // ✅ Redirect after completion
   useEffect(() => {
-    if (currentStage === "done") {
+    if (currentStage.key === "done") {
       const timer = setTimeout(() => {
         setIsTheChatStarted(false);
         router.push(`/workspace/${projectId}`);
@@ -186,34 +207,34 @@ export default function Page() {
   if (loading) return <p>Loading...</p>;
 
   // ✅ Animated stages screen
-  if (isTheChatStarted) {
-    if (currentStage === null) {
-      return (
-        <StageScreen title="Starting..." subtitle="Preparing project..." />
-      );
-    }
-    if (currentStage === "done") {
-      return (
-        <StageScreen
-          title="Workspace Ready"
-          subtitle="Redirecting to editor..."
-          success
-        />
-      );
-    }
+  // if (isTheChatStarted) {
+  //   if (currentStage === null) {
+  //     return (
+  //       <StageScreen title="Starting..." subtitle="Preparing project..." />
+  //     );
+  //   }
+  //   if (currentStage === "done") {
+  //     return (
+  //       <StageScreen
+  //         title="Workspace Ready"
+  //         subtitle="Redirecting to editor..."
+  //         success
+  //       />
+  //     );
+  //   }
 
-    const stage = stages.find((s) => s.key === currentStage);
-    return <StageScreen title={stage?.title!} subtitle={stage?.subtitle!} />;
-  }
+  //   const stage = stages.find((s) => s.key === currentStage);
+  //   return <StageScreen title={stage?.title!} subtitle={stage?.subtitle!} />;
+  // }
 
   // ✅ Main UI
   return (
-    <div className="min-h-[400vh] relative flex flex-col">
+    <div className="min-h-screen relative flex flex-col">
       <NavigationBar user={user} handleLogout={handleLogout} />
 
       {/* Chat + Upload */}
       <main className="flex flex-1 justify-center items-center p-6 bg-gray-800">
-        <Card className="w-full max-w-2xl p-4 shadow-lg border rounded-2xl">
+        <Card className="w-full max-w-2xl p-4 shadow-lg border rounded-2xl z-10">
           <CardContent className="flex flex-col gap-4">
             <Textarea
               placeholder="Type your message here..."
@@ -270,7 +291,27 @@ export default function Page() {
             )}
           </CardContent>
         </Card>
+        {isTheChatStarted && currentStage === null ? (
+          <StageScreen title="Starting..." subtitle="Preparing project..." />
+        ) : currentStage.key === "done" ? (
+          <StageScreen
+            title="Workspace Ready"
+            subtitle="Redirecting to editor..."
+            success
+          />
+        ) : (
+          (() => {
+            const stage = stages.find((s) => s.key === currentStage.key);
+            return (
+              <StageScreen
+                title={stage?.title ?? ""}
+                subtitle={stage?.subtitle ?? ""}
+              />
+            );
+          })()
+        )}
       </main>
+      <BackgroundBeams />
     </div>
   );
 }
@@ -286,7 +327,7 @@ function StageScreen({
   success?: boolean;
 }) {
   return (
-    <div className="h-screen flex justify-center items-center bg-gray-50">
+    <div className="h-screen inset-0 w-full flex justify-center items-center absolute z-40 bg-white/20 backdrop-blur-2xl">
       <AnimatePresence mode="wait">
         <motion.div
           key={title}
