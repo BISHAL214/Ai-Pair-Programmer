@@ -1,5 +1,6 @@
 import Docker, { Container, ContainerCreateOptions } from "dockerode";
 import { env } from "./neededEnv";
+import * as path from "path";
 
 export type Template = "next" | "node" | "react";
 
@@ -26,7 +27,7 @@ export interface ContainerInfo {
 
 export class ContainerManager {
   private docker: Docker;
-  // private NGINX_BASE_DIR = path.join(__dirname, "../../nginx/conf.d");
+  private NGINX_BASE_DIR = path.join(__dirname, "../../nginx/conf.d");
   // private NGINX_CONTAINER_NAME = "aipp-nginx";
   // private NGINX_PORT = 80;
 
@@ -35,30 +36,79 @@ export class ContainerManager {
       ? new Docker({ host: env.DOCKER_HOST })
       : new Docker({ socketPath: env.DOCKER_SOCKET });
   }
+
   //   nginxConfText(
   //     containerAlias: string,
   //     hostName: string,
   //     internalPort: number
   //   ) {
   //     return `
-  // server {
-  //   listen 80;
-  //   server_name ${hostName};
+  //     server {
+  //       listen 80;
+  //       server_name ${hostName};
 
-  //   location / {
-  //     proxy_pass http://${containerAlias}:${internalPort};
-  //     proxy_set_header Host $host;
-  //     proxy_set_header X-Real-IP $remote_addr;
-  //     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-  //     proxy_http_version 1.1;
-  //     proxy_set_header Upgrade $http_upgrade;
-  //     proxy_set_header Connection "upgrade";
-  //     proxy_read_timeout 3600;
-  //     proxy_send_timeout 3600;
+  //       location / {
+  //         proxy_pass http://${containerAlias}:${internalPort};
+  //         proxy_set_header Host $host;
+  //         proxy_set_header X-Real-IP $remote_addr;
+  //         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  //         proxy_http_version 1.1;
+  //         proxy_set_header Upgrade $http_upgrade;
+  //         proxy_set_header Connection "upgrade";
+  //         proxy_read_timeout 3600;
+  //         proxy_send_timeout 3600;
+  //       }
+  //     }
+  //     `.trim();
   //   }
-  // }
-  // `.trim();
-  //   }
+
+  async startNginxProxy(userId: string): Promise<Docker.Container> {
+    const docker = this.docker;
+    const networkName = await this.ensureUserNetwork(userId);
+    const containerName = `aipp-nginx-${userId}`;
+
+    // Remove old container if exists
+    const old = await this.findContainer(containerName);
+    if (old) {
+      await old.remove({ force: true });
+      console.log(`ℹ️ Removed old Nginx container: ${containerName}`);
+    }
+
+    // Create new Nginx container
+    const container = await docker.createContainer({
+      name: containerName,
+      Image: "nginx:stable",
+      Tty: true,
+      HostConfig: {
+        NetworkMode: networkName,
+        Mounts: [
+          {
+            Source: this.NGINX_BASE_DIR,
+            Target: "/etc/nginx/conf.d",
+            Type: "bind",
+            ReadOnly: true,
+          },
+        ],
+      },
+      NetworkingConfig: {
+        EndpointsConfig: {
+          [networkName]: {
+            Aliases: ["nginx-supabase-proxy"],
+          },
+        },
+      },
+    });
+
+    await container.start();
+    console.log(
+      `✅ Started Nginx proxy: ${containerName} on network ${networkName}`
+    );
+    return container;
+  }
+
+  getDockerInstance() {
+    return this.docker;
+  }
 
   // Generate consistent container names[web:58]
   getContainerName(userId: string, projectId: string): string {
@@ -71,7 +121,76 @@ export class ContainerManager {
   }
 
   // Create isolated network for user containers[web:61]
-  async ensureUserNetwork(userId: string): Promise<string> {
+  //   async ensureUserNetwork(
+  //     userId: string,
+  //     isInitialNetworkChanging?: boolean
+  //   ): Promise<string> {
+  //     const networkName = `aipp_net_${userId}`;
+
+  //     try {
+  //       const networks = await this.docker.listNetworks({
+  //         filters: { name: [networkName] } as any,
+  //       });
+
+  //       if (networks.length === 0) {
+  //         await this.docker.createNetwork({
+  //           Name: networkName,
+  //           Driver: "bridge",
+  //           Internal: false, // No external access
+  //           IPAM: {
+  //             Config: [
+  //               { Subnet: `172.${20 + (userId.charCodeAt(0) % 235)}.0.0/16` },
+  //             ],
+  //           },
+  //         });
+  //         console.log(
+  //           `✅ Created network with internal false initially: ${networkName}`
+  //         );
+  //       } else if (networks.length > 0 && isInitialNetworkChanging) {
+  //         console.log(`✅ Network ${networkName} already exists`);
+  //         console.log(`disconnecting and removing old network...`);
+  //         await this.docker
+  //           .getNetwork(networkName)
+  //           .disconnect()
+  //           .then(() => {
+  //             console.log(`disconnected old network`);
+  //           })
+  //           .catch((err) => {
+  //             console.error("Failed to disconnect old network:", err);
+  //           });
+  //         await this.docker
+  //           .getNetwork(networkName)
+  //           .remove()
+  //           .then(() => {
+  //             console.log(`removed old network`);
+  //           })
+  //           .catch((err) => {
+  //             console.error("Failed to remove old network:", err);
+  //           });
+  //         console.log(`recreating network...`);
+  //         await this.docker.createNetwork({
+  //           Name: networkName,
+  //           Driver: "bridge",
+  //           Internal: true, // No external access
+  //           IPAM: {
+  //             Config: [
+  //               { Subnet: `172.${20 + (userId.charCodeAt(0) % 235)}.0.0/16` },
+  //             ],
+  //           },
+  //         });
+  //         console.log(`✅ Recreated network with internal true: ${networkName}`);
+  //       }
+  //       return networkName;
+  //     } catch (error) {
+  //       console.error(`❌ Failed to create network ${networkName}:`, error);
+  //       throw error;
+  //     }
+  //   }
+
+  async ensureUserNetwork(
+    userId: string,
+    isInitialNetworkChanging?: boolean
+  ): Promise<string> {
     const networkName = `aipp_net_${userId}`;
 
     try {
@@ -80,6 +199,57 @@ export class ContainerManager {
       });
 
       if (networks.length === 0) {
+        // Create initial network with internal: false
+        await this.docker.createNetwork({
+          Name: networkName,
+          Driver: "bridge",
+          Internal: false,
+          IPAM: {
+            Config: [
+              { Subnet: `172.${20 + (userId.charCodeAt(0) % 235)}.0.0/16` },
+            ],
+          },
+        });
+        console.log(
+          `✅ Created network with internal false initially: ${networkName}`
+        );
+      } else if (networks.length > 0 && isInitialNetworkChanging) {
+        console.log(`✅ Network ${networkName} already exists`);
+        const network = this.docker.getNetwork(networkName);
+
+        // Get a list of all containers connected to this network.
+        const networkInfo = await network.inspect();
+        const connectedContainers = Object.keys(networkInfo.Containers || {});
+
+        if (connectedContainers.length > 0) {
+          console.log(
+            `Disconnecting containers from network ${networkName}...`
+          );
+          for (const containerId of connectedContainers) {
+            try {
+              const container = this.docker.getContainer(containerId);
+              await network.disconnect({ Container: container.id });
+              console.log(
+                `Disconnected container ${containerId} from network ${networkName}`
+              );
+            } catch (err) {
+              console.error(
+                `Failed to disconnect container ${containerId}:`,
+                err
+              );
+            }
+          }
+        } else {
+          console.log(
+            `No containers to disconnect from network ${networkName}`
+          );
+        }
+
+        console.log(`Removing old network ${networkName}...`);
+        await network.remove();
+        console.log(`removed old network`);
+
+        console.log(`Recreating network...`);
         await this.docker.createNetwork({
           Name: networkName,
           Driver: "bridge",
@@ -90,11 +260,11 @@ export class ContainerManager {
             ],
           },
         });
-        console.log(`✅ Created network: ${networkName}`);
+        console.log(`✅ Recreated network with internal true: ${networkName}`);
       }
       return networkName;
     } catch (error) {
-      console.error(`❌ Failed to create network ${networkName}:`, error);
+      console.error(`❌ Failed to process network ${networkName}:`, error);
       throw error;
     }
   }
@@ -206,7 +376,9 @@ export class ContainerManager {
         NetworkMode: networkName,
 
         // No port exposure by default
-        PortBindings: {},
+        PortBindings: {
+          // "3000/tcp": [{ HostPort: "3000" }], // Example if needed
+        },
         PublishAllPorts: false,
       },
     };
@@ -323,7 +495,7 @@ export class ContainerManager {
         } as any,
       });
 
-      return containers.map((c) => ({
+      return containers.map((c: any) => ({
         id: c.Id,
         name: c.Names[0],
         status: c.State as any,

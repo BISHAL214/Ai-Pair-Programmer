@@ -5,6 +5,7 @@
     "target": "es6",
     "moduleResolution": "node",
     "jsxImportSource": "hono/jsx",
+    "allowSyntheticDefaultImports": true,
     "paths": {
       "@ai_pair_programmer/db": ["../../packages/db"],
       "@ai_pair_programmer/supabase-client": ["../../packages/supabase-client"],

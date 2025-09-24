@@ -11,6 +11,7 @@ import { simpleGit } from "simple-git";
 import * as unzipper from "unzipper";
 import { produceEvent } from "./inngest/utils/inngestEventProducer";
 import { containerManagerQueue } from "./queue";
+import JsZip from "jszip";
 
 const supabase_url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabase_service_role_key = process.env.SERVICE_ROLE_KEY!;
@@ -76,26 +77,16 @@ export async function extractFilesFromGitAndUpload(
 
   try {
     const git = simpleGit();
-    // const newProject = await db
-    //   .insert(schema.projects)
-    //   .values({
-    //     name: repoName,
-    //     userId: userId,
-    //     sourceType: "github",
-    //     githubUrl: repoUrl,
-    //   })
-    //   .returning({ projectId: schema.projects.id });
-    // const projectId = newProject[0].projectId;
-
+    const zip = new JsZip();
+    // clone the repo
     await git.clone(repoWithAuth, baseDir);
     let supaPath = "";
     const detectedTypes = new Set<string>();
     const detectedTools = new Set<string>();
 
     for (const branch of branches) {
-      const branchGit = simpleGit(baseDir);
-      // Checkout each specified branch sequentially.
-      await branchGit.checkout(branch);
+      const branchGit = simpleGit(baseDir); // get the branch.
+      await branchGit.checkout(branch); // Checkout each specified branch sequentially
 
       const files = await walkFiles(baseDir, baseDir);
       for (const relativePath of files) {
@@ -103,20 +94,20 @@ export async function extractFilesFromGitAndUpload(
         const content = await fs.readFile(absPath, "utf8");
         const extension = path.extname(relativePath).slice(1);
         supaPath = `projects/${projectId}/${branch}/${relativePath}`;
-
+        zip.file(`${branch}/${relativePath}`, content);
         // Upload to Supabase Storage
-        await createSupabaseServerClient.storage
-          .from("projects")
-          .upload(supaPath, content, {
-            contentType: "text/plain",
-            upsert: true,
-          })
-          .then(() => {
-            console.log(`Uploaded ${supaPath} to Supabase Storage`);
-          })
-          .catch((error) => {
-            console.error(`Failed to upload ${supaPath}:`, error);
-          });
+        //   await createSupabaseServerClient.storage
+        //     .from("projects")
+        //     .upload(supaPath, content, {
+        //       contentType: "text/plain",
+        //       upsert: true,
+        //     })
+        //     .then(() => {
+        //       console.log(`Uploaded ${supaPath} to Supabase Storage`);
+        //     })
+        //     .catch((error) => {
+        //       console.error(`Failed to upload ${supaPath}:`, error);
+        //     });
 
         // Store in Supabase DB
         await db
@@ -146,7 +137,20 @@ export async function extractFilesFromGitAndUpload(
         }
       }
     }
-
+    const zipBuffer = await zip.generateAsync({ type: "nodebuffer" });
+    const zipPath = `projects/${projectId}/${repoName}.zip`;
+    await createSupabaseServerClient.storage
+      .from("projects")
+      .upload(zipPath, zipBuffer, {
+        contentType: "application/zip",
+        upsert: true,
+      })
+      .then(() => {
+        console.log(`✅ Uploaded zip to ${zipPath}`);
+      })
+      .catch((error) => {
+        console.error(`❌ Failed to upload zip ${zipPath}:`, error);
+      });
     console.log(
       `Extraction and upload complete for project ${repoName} from github, branches: ${branches.join(", ")}`
     );
@@ -154,13 +158,17 @@ export async function extractFilesFromGitAndUpload(
     console.log("Detected tools:", Array.from(detectedTools));
     console.log("sending job to container manager queue");
 
-    const containerJob = await containerManagerQueue.add("setup-environment", {
-      userId,
-      projectId,
-      template: Array.from(detectedTypes)[0], // Default template, can be enhanced to be dynamic based on detectedTypes
-      cpu: 1,
-      memoryMB: 512,
-    }, { attempts: 3, removeOnComplete: true });
+    const containerJob = await containerManagerQueue.add(
+      "setup-environment",
+      {
+        userId,
+        projectId,
+        template: Array.from(detectedTypes)[0], // Default template, can be enhanced to be dynamic based on detectedTypes
+        cpu: 1,
+        memoryMB: 512,
+      },
+      { attempts: 3, removeOnComplete: true }
+    );
 
     console.log("sending event to inngest");
     produceEvent({
@@ -170,6 +178,8 @@ export async function extractFilesFromGitAndUpload(
         projectId,
         userId,
         supaPath,
+        zipPath,
+        branches, // include branches in the event data for later syncing the files from the correct branch
         types: Array.from(detectedTypes),
         tools: Array.from(detectedTools),
         monorepo: detectedTypes.size > 1,
@@ -211,17 +221,6 @@ export async function extractFileFromUploadedZip(
         }
       })
     );
-
-    // const newProject = await db
-    //   .insert(schema.projects)
-    //   .values({
-    //     name: projectName,
-    //     userId,
-    //     sourceType: "zip",
-    //   })
-    //   .returning({ projectId: schema.projects.id });
-
-    // const projectId = newProject[0].projectId;
 
     const files = await walkFiles(tmpDir, tmpDir);
     let supaPath = "";

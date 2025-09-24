@@ -9,7 +9,7 @@ import { promises as fs } from "node:fs";
 import db, { schema } from "@ai_pair_programmer/db";
 import { serve } from "inngest/hono";
 import { inngest } from "@ai_pair_programmer/inngest";
-import { waitForContainer } from "./inngest/functions/waitForCOntainer";
+import { waitForContainer } from "./inngest/functions/waitForContainer";
 import { startFileSync } from "./inngest/functions/startFileSync";
 import { swaggerUI, SwaggerUI } from "@hono/swagger-ui";
 

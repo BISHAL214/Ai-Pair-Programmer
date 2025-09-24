@@ -22,6 +22,7 @@ import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { NavigationBar } from "@/components/asternity/navbar";
 import { BackgroundBeams } from "@/components/asternity/background-beams";
+import { MultiStageLoaderComplete } from "@/__components-app/project-loader";
 
 export default function Page() {
   const router = useRouter();
@@ -31,7 +32,7 @@ export default function Page() {
 
   const [selectedRepo, setSelectedRepo] = useState<any | null>(null);
   const [selectedBranches, setSelectedBranches] = useState<string[]>([]);
-  const [isTheChatStarted, setIsTheChatStarted] = useState(true);
+  const [isTheChatStarted, setIsTheChatStarted] = useState(false);
   const [projectSourceType, setProjectSourceType] = useState<
     "github" | "zip" | ""
   >("");
@@ -98,65 +99,44 @@ export default function Page() {
   }, [extractJob, setProjectUserId, setInfo]);
 
   // ✅ Define stages
-  const stages = useMemo(
-    () => [
-      {
-        key: "extraction",
-        title: "Extracting Project",
-        subtitle: "Analyzing repository & preparing files...",
-      },
-      {
-        key: "container",
-        title: "Creating Environment",
-        subtitle: "Spinning up Docker container...",
-      },
-      {
-        key: "fileSync",
-        title: "Syncing Files",
-        subtitle: "Finalizing project workspace...",
-      },
-      {
-        key: "done",
-        title: "All Set!",
-        subtitle: "Redirecting to your workspace...",
-      },
-    ],
-    []
-  );
-  const [stageIndex, setStageIndex] = useState(0);
+  // const stages = useMemo(
+  //   () => [
+  //     {
+  //       key: "extraction",
+  //       title: "Extracting Project",
+  //       subtitle: "Analyzing repository & preparing files...",
+  //     },
+  //     {
+  //       key: "container",
+  //       title: "Creating Environment",
+  //       subtitle: "Spinning up Docker container...",
+  //     },
+  //     {
+  //       key: "fileSync",
+  //       title: "Syncing Files",
+  //       subtitle: "Finalizing project workspace...",
+  //     },
+  //     {
+  //       key: "done",
+  //       title: "All Set!",
+  //       subtitle: "Redirecting to your workspace...",
+  //     },
+  //   ],
+  //   []
+  // );
+  // const [stageIndex, setStageIndex] = useState(0);
   // ⏳ Fake progression using setTimeout
-  useEffect(() => {
-    if (stageIndex < stages.length - 1) {
-      const timer = setTimeout(() => {
-        setStageIndex((prev) => prev + 1);
-      }, 40000); // change stage every 2s
+  // useEffect(() => {
+  //   if (stageIndex < stages.length - 1) {
+  //     const timer = setTimeout(() => {
+  //       setStageIndex((prev) => prev + 1);
+  //     }, 40000); // change stage every 2s
 
-      return () => clearTimeout(timer);
-    }
-  }, [stageIndex]);
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [stageIndex]);
 
   // ✅ Determine current stage
-  // const currentStage = useMemo(() => {
-  //   if (!info.extraction) return null;
-
-  //   if (info.fileSync?.status === "completed") return "done";
-  //   if (info.fileSync) return "fileSync";
-  //   if (info.container) return "container";
-  //   return "extraction";
-  // }, [info.extraction, info.container, info.fileSync]);
-  const currentStage = useMemo(() => {
-    return stages[stageIndex];
-  }, [stageIndex]);
-  // ✅ Redirect after completion
-  useEffect(() => {
-    if (currentStage.key === "done") {
-      const timer = setTimeout(() => {
-        setIsTheChatStarted(false);
-        router.push(`/workspace/${projectId}`);
-      }, 2500);
-      return () => clearTimeout(timer);
-    }
-  }, [currentStage, router, projectId]);
 
   const handleConnectGitHub = () => {
     supabase.auth.signInWithOAuth({
@@ -262,7 +242,7 @@ export default function Page() {
                 >
                   <option value="">Select a repo...</option>
                   {repos.map((repo: any) => (
-                    <option key={repo.id} value={JSON.stringify(repo)}>
+                    <option className="bg-gray-700" key={repo.id} value={JSON.stringify(repo)}>
                       {repo.name}
                     </option>
                   ))}
@@ -291,24 +271,10 @@ export default function Page() {
             )}
           </CardContent>
         </Card>
-        {isTheChatStarted && currentStage === null ? (
-          <StageScreen title="Starting..." subtitle="Preparing project..." />
-        ) : currentStage.key === "done" ? (
-          <StageScreen
-            title="Workspace Ready"
-            subtitle="Redirecting to editor..."
-            success
+        {isTheChatStarted && (
+          <MultiStageLoaderComplete
+            setIsTheChatStarted={setIsTheChatStarted}
           />
-        ) : (
-          (() => {
-            const stage = stages.find((s) => s.key === currentStage.key);
-            return (
-              <StageScreen
-                title={stage?.title ?? ""}
-                subtitle={stage?.subtitle ?? ""}
-              />
-            );
-          })()
         )}
       </main>
       <BackgroundBeams />
@@ -353,25 +319,22 @@ function StageScreen({
   );
 }
 
-{
-  /* Navbar */
-}
-{
-  /* <nav className="w-full px-6 py-4 bg-gray-700 flex justify-between items-center border-b">
-        <h1 className="text-xl font-bold">My AI App</h1>
-        <div className="flex gap-4 items-center">
-          {!user ? (
-            <Button>
-              <Link href="/auth">Login</Link>
-            </Button>
-          ) : (
-            <>
-              <span className="text-sm">Welcome, {user.email}</span>
-              <Button variant="outline" onClick={handleLogout}>
-                Logout
-              </Button>
-            </>
-          )}
-        </div>
-      </nav> */
-}
+// {isTheChatStarted && currentStage === null ? (
+//           <StageScreen title="Starting..." subtitle="Preparing project..." />
+//         ) : currentStage.key === "done" ? (
+//           <StageScreen
+//             title="Workspace Ready"
+//             subtitle="Redirecting to editor..."
+//             success
+//           />
+//         ) : (
+//           (() => {
+//             const stage = stages.find((s) => s.key === currentStage.key);
+//             return (
+//               <StageScreen
+//                 title={stage?.title ?? ""}
+//                 subtitle={stage?.subtitle ?? ""}
+//               />
+//             );
+//           })()
+//         )}

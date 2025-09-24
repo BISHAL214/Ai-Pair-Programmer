@@ -92,26 +92,3 @@ worker.on("completed", (job) => {
 worker.on("failed", (job, err) => {
   console.error(`❌ Job ${job?.id} failed:`, err);
 });
-
-// const queueEvents = new QueueEvents("container-manager", { connection });
-
-// queueEvents.on("completed", async ({ jobId }: { jobId: string }) => {
-//   console.log(`🔔 Job ${jobId} has been completed`);
-//   // Notify the client about job completion via WebSocket
-//   const job = await Job.fromId(containerManagerQueue, jobId);
-//   if (!job) return;
-
-//   const { userId, projectId, containerInfo } = job.returnvalue;
-//   const room = `${projectId}:${userId}`;
-//   try {
-//     getIO().to(room).emit("container", {
-//       status: "completed",
-//       jobId,
-//       containerId: containerInfo?.id,
-//       containerStatus: containerInfo?.status,
-//     });
-//     console.log(`Job ${jobId} output:`, containerInfo);
-//   } catch (error) {
-//     console.error("⚠️ Socket.IO not initialized (is server running?)", error);
-//   }
-// });
