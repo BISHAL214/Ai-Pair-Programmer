@@ -4,6 +4,12 @@ import "./globals.css";
 import { AuthProvider } from "@/lib/auth";
 import ReactQueryClientProviders from "@/lib/query-client";
 import { ThemeProvider } from "@/themes/provider";
+import {
+  SpacemanThemeProvider,
+  ThemeSwitcher,
+  ThemeSelector,
+} from "@space-man/react-theme-animation";
+import Providers from "./providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,16 +36,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <AuthProvider>
-            <ReactQueryClientProviders>{children}</ReactQueryClientProviders>
-          </AuthProvider>
-        </ThemeProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

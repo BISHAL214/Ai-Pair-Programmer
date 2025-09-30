@@ -88,7 +88,7 @@ export const AuthForm = ({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="w-full max-w-md space-y-6 p-6 border rounded-2xl shadow-sm bg-white dark:bg-zinc-950"
+      className="w-full max-w-md space-y-6 p-6 border z-10 rounded-2xl shadow-sm bg-white dark:bg-zinc-950"
     >
       <h2 className="text-2xl font-semibold tracking-tight capitalize">
         {mode === 'signup' ? 'Create an account' : 'Sign in to your account'}

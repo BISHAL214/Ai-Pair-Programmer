@@ -23,6 +23,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { NavigationBar } from "@/components/asternity/navbar";
 import { BackgroundBeams } from "@/components/asternity/background-beams";
 import { MultiStageLoaderComplete } from "@/__components-app/project-loader";
+import { AnimatedAIChat } from "@/__components-app/ai-chatInput";
+import PixelBlast from "@/__components-app/pixel-blast";
 
 export default function Page() {
   const router = useRouter();
@@ -213,128 +215,101 @@ export default function Page() {
       <NavigationBar user={user} handleLogout={handleLogout} />
 
       {/* Chat + Upload */}
-      <main className="flex flex-1 justify-center items-center p-6 bg-gray-800">
-        <Card className="w-full max-w-2xl p-4 shadow-lg border rounded-2xl z-10">
-          <CardContent className="flex flex-col gap-4">
-            <Textarea
-              placeholder="Type your message here..."
-              className="h-32"
-            />
-            <div className="flex gap-4">
-              <Button onClick={handleChatStarted}>Send</Button>
-              <Input
-                onChange={handleZipInputChange}
-                type="file"
-                accept=".zip"
-                className="cursor-pointer"
-              />
-            </div>
-
-            {!isGitHubConnected ? (
-              <Button onClick={handleConnectGitHub}>Connect GitHub</Button>
-            ) : (
-              <>
-                <Label className="mt-4">Select GitHub Repo</Label>
-                <select
-                  onChange={(e) => setSelectedRepo(JSON.parse(e.target.value))}
-                  className="border p-2 rounded"
-                  value={selectedRepo ? JSON.stringify(selectedRepo) : ""}
-                >
-                  <option value="">Select a repo...</option>
-                  {repos.map((repo: any) => (
-                    <option className="bg-gray-700" key={repo.id} value={JSON.stringify(repo)}>
-                      {repo.name}
-                    </option>
-                  ))}
-                </select>
-
-                {branches.length > 0 && (
-                  <>
-                    <Label className="mt-4">Select Branches</Label>
-                    <div className="flex flex-col gap-1">
-                      {branches.map((branch: any) => (
-                        <label
-                          key={branch.name}
-                          className="flex items-center gap-2"
-                        >
-                          <Checkbox
-                            checked={selectedBranches.includes(branch.name)}
-                            onCheckedChange={() => toggleBranch(branch.name)}
-                          />
-                          {branch.name}
-                        </label>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </>
-            )}
-          </CardContent>
-        </Card>
-        {isTheChatStarted && (
-          <MultiStageLoaderComplete
-            setIsTheChatStarted={setIsTheChatStarted}
-          />
-        )}
-      </main>
-      <BackgroundBeams />
+      {/* <main className="flex flex-1 justify-center items-center p-6 bg-gray-800"> */}
+      {/*   <Card className="w-full max-w-2xl p-4 shadow-lg border rounded-2xl z-10"> */}
+      {/*     <CardContent className="flex flex-col gap-4"> */}
+      {/*       <Textarea */}
+      {/*         placeholder="Type your message here..." */}
+      {/*         className="h-32" */}
+      {/*       /> */}
+      {/*       <div className="flex gap-4"> */}
+      {/*         <Button onClick={handleChatStarted}>Send</Button> */}
+      {/*         <Input */}
+      {/*           onChange={handleZipInputChange} */}
+      {/*           type="file" */}
+      {/*           accept=".zip" */}
+      {/*           className="cursor-pointer" */}
+      {/*         /> */}
+      {/*       </div> */}
+      {/**/}
+      {/*       {!isGitHubConnected ? ( */}
+      {/*         <Button onClick={handleConnectGitHub}>Connect GitHub</Button> */}
+      {/*       ) : ( */}
+      {/*         <> */}
+      {/*           <Label className="mt-4">Select GitHub Repo</Label> */}
+      {/*           <select */}
+      {/*             onChange={(e) => setSelectedRepo(JSON.parse(e.target.value))} */}
+      {/*             className="border p-2 rounded" */}
+      {/*             value={selectedRepo ? JSON.stringify(selectedRepo) : ""} */}
+      {/*           > */}
+      {/*             <option value="">Select a repo...</option> */}
+      {/*             {repos.map((repo: any) => ( */}
+      {/*               <option */}
+      {/*                 className="bg-gray-700" */}
+      {/*                 key={repo.id} */}
+      {/*                 value={JSON.stringify(repo)} */}
+      {/*               > */}
+      {/*                 {repo.name} */}
+      {/*               </option> */}
+      {/*             ))} */}
+      {/*           </select> */}
+      {/**/}
+      {/*           {branches.length > 0 && ( */}
+      {/*             <> */}
+      {/*               <Label className="mt-4">Select Branches</Label> */}
+      {/*               <div className="flex flex-col gap-1"> */}
+      {/*                 {branches.map((branch: any) => ( */}
+      {/*                   <label */}
+      {/*                     key={branch.name} */}
+      {/*                     className="flex items-center gap-2" */}
+      {/*                   > */}
+      {/*                     <Checkbox */}
+      {/*                       checked={selectedBranches.includes(branch.name)} */}
+      {/*                       onCheckedChange={() => toggleBranch(branch.name)} */}
+      {/*                     /> */}
+      {/*                     {branch.name} */}
+      {/*                   </label> */}
+      {/*                 ))} */}
+      {/*               </div> */}
+      {/*             </> */}
+      {/*           )} */}
+      {/*         </> */}
+      {/*       )} */}
+      {/*     </CardContent> */}
+      {/*   </Card> */}
+      {/*   {isTheChatStarted && ( */}
+      {/*     <MultiStageLoaderComplete setIsTheChatStarted={setIsTheChatStarted} /> */}
+      {/*   )} */}
+      {/* </main> */}
+      <AnimatedAIChat
+        handleGithubConnect={handleConnectGitHub}
+        githubToken={githubToken}
+        branches={branches}
+        repos={repos}
+        selectRepo={setSelectedRepo}
+        selectedRepo={selectedRepo}
+      />
+      <div className="w-full h-[800px] absolute hidden dark:block">
+        <PixelBlast
+          variant="circle"
+          pixelSize={6}
+          color="#B19EEF"
+          patternScale={3}
+          patternDensity={1.2}
+          pixelSizeJitter={0.5}
+          enableRipples
+          rippleSpeed={0.4}
+          rippleThickness={0.12}
+          rippleIntensityScale={1.5}
+          liquid
+          liquidStrength={0.12}
+          liquidRadius={1.2}
+          liquidWobbleSpeed={5}
+          speed={0.6}
+          edgeFade={0.25}
+          transparent
+        />
+      </div>
     </div>
   );
 }
-
-/* ✅ Animated Stage Screen Component */
-function StageScreen({
-  title,
-  subtitle,
-  success = false,
-}: {
-  title: string;
-  subtitle: string;
-  success?: boolean;
-}) {
-  return (
-    <div className="h-screen inset-0 w-full flex justify-center items-center absolute z-40 bg-white/20 backdrop-blur-2xl">
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={title}
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -15 }}
-          transition={{ duration: 0.5 }}
-          className="text-center"
-        >
-          <motion.h2
-            className={`text-2xl font-bold ${
-              success ? "text-green-600" : "text-gray-800"
-            }`}
-            animate={{ scale: [1, 1.05, 1] }}
-            transition={{ repeat: success ? 0 : Infinity, duration: 2 }}
-          >
-            {title}
-          </motion.h2>
-          <p className="mt-2 text-gray-500">{subtitle}</p>
-        </motion.div>
-      </AnimatePresence>
-    </div>
-  );
-}
-
-// {isTheChatStarted && currentStage === null ? (
-//           <StageScreen title="Starting..." subtitle="Preparing project..." />
-//         ) : currentStage.key === "done" ? (
-//           <StageScreen
-//             title="Workspace Ready"
-//             subtitle="Redirecting to editor..."
-//             success
-//           />
-//         ) : (
-//           (() => {
-//             const stage = stages.find((s) => s.key === currentStage.key);
-//             return (
-//               <StageScreen
-//                 title={stage?.title ?? ""}
-//                 subtitle={stage?.subtitle ?? ""}
-//               />
-//             );
-//           })()
-//         )}
