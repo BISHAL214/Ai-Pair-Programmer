@@ -1,24 +1,22 @@
 "use client";
 
-import { useEffect, useRef, useCallback, useTransition } from "react";
-import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { AnimatePresence, motion } from "framer-motion";
 import {
-  ImageIcon,
+  ChevronDown,
+  Command,
   Figma,
+  Github,
+  ImageIcon,
+  LoaderIcon,
   MonitorIcon,
-  ArrowUpIcon,
   Paperclip,
   SendIcon,
-  XIcon,
-  LoaderIcon,
   Sparkles,
-  Command,
-  Github,
-  ChevronDown,
+  XIcon,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 import * as React from "react";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { DropdownMenu } from "./floating-dropdown";
 
 interface UseAutoResizeTextareaProps {
@@ -141,9 +139,9 @@ export function AnimatedAIChat({
   handleGithubConnect: () => void;
   githubToken: string | null;
   branches: string[];
-  repos: any[];
-  selectRepo: (repo: any) => void;
-  selectedRepo: any;
+  repos: unknown[] | any[];
+  selectRepo: (repo: unknown) => void;
+  selectedRepo: unknown | any;
 }) {
   const [value, setValue] = useState("");
   const [attachments, setAttachments] = useState<string[]>([]);
@@ -208,7 +206,7 @@ export function AnimatedAIChat({
     } else {
       setShowCommandPalette(false);
     }
-  }, [value]);
+  }, [value, commandSuggestions]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -548,18 +546,16 @@ export function AnimatedAIChat({
                     </motion.button>
 
                     {/* <div className="relative"> */}
-                      <DropdownMenu
-                        ref={repoDropdownRef as React.RefObject<HTMLDivElement>}
-                        isOpen={showRepoDropdown}
-                        options={repos.map((repo) => ({
-                          label: formatString(repo.name),
-                          onClick: () => selectRepo(repo),
-                          Icon: (
-                            <Github className="w-4 h-4" aria-hidden="true" />
-                          ),
-                        }))}
-                        maxVisible={5} // shows ~5 items; list scrolls with hidden scrollbar
-                      />
+                    <DropdownMenu
+                      ref={repoDropdownRef as React.RefObject<HTMLDivElement>}
+                      isOpen={showRepoDropdown}
+                      options={repos.map((repo) => ({
+                        label: formatString(repo.name),
+                        onClick: () => selectRepo(repo),
+                        Icon: <Github className="w-4 h-4" aria-hidden="true" />,
+                      }))}
+                      maxVisible={5} // shows ~5 items; list scrolls with hidden scrollbar
+                    />
                   </div>
                 )}
               </div>

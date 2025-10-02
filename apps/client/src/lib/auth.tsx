@@ -1,44 +1,49 @@
-'use client'
+"use client";
 
-import React from 'react'
-import { createContext, useContext, useEffect, useState } from 'react'
-import { Session, User } from '@supabase/supabase-js'
-import { createSupabaseBrowserClient } from '@ai_pair_programmer/supabse-client'
+import React from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { Session, User } from "@supabase/supabase-js";
+import { createSupabaseBrowserClient } from "@ai_pair_programmer/supabse-client";
 
 type AuthContextType = {
-  supabase: ReturnType<typeof createSupabaseBrowserClient>
-  session: Session | null
-  user: User | null
-  loading: boolean
-}
+  supabase: ReturnType<typeof createSupabaseBrowserClient>;
+  session: Session | null;
+  user: User | null;
+  loading: boolean;
+};
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const supabase = createSupabaseBrowserClient(supabaseUrl, supabaseAnonKey)
-  const [session, setSession] = useState<Session | null>(null)
-  const [loading, setLoading] = useState(true)
+  const supabase = createSupabaseBrowserClient(supabaseUrl, supabaseAnonKey);
+  console.log(supabase);
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const getSession = async () => {
-      const { data } = await supabase.auth.getSession()
-      setSession(data.session ?? null)
-      setLoading(false)
-    }
+      const { data } = await supabase.auth.getSession();
+      setSession(data.session ?? null);
+      setLoading(false);
+    };
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session ?? null)
-    })
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSession(session ?? null);
+      }
+    );
 
-    getSession()
+    getSession();
 
     return () => {
-      listener.subscription.unsubscribe()
-    }
-  }, [supabase])
+      listener.subscription.unsubscribe();
+    };
+  }, [supabase]);
+
+  console.log("session", session);
 
   return (
     <AuthContext.Provider
@@ -51,11 +56,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     >
       {children}
     </AuthContext.Provider>
-  )
-}
+  );
+};
 
 export const useAuth = () => {
-  const context = useContext(AuthContext)
-  if (!context) throw new Error('useAuth must be used within AuthProvider')
-  return context
-}
+  const context = useContext(AuthContext);
+  if (!context) throw new Error("useAuth must be used within AuthProvider");
+  return context;
+};

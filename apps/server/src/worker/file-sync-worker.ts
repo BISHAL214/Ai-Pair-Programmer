@@ -1,5 +1,5 @@
-import * as dotenv from "dotenv";
-dotenv.config({ path: "../../.env" });
+// import * as dotenv from "dotenv";
+// dotenv.config({ path: "../../.env" });
 
 import { connection } from "@ai_pair_programmer/redis";
 import { Worker } from "bullmq";

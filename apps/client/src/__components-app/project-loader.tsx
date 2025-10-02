@@ -1,18 +1,10 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  CheckCircle,
-  XCircle,
-  Loader2,
-  ArrowRight,
-  Sparkles,
-  Trophy,
-  Star,
-} from "lucide-react";
 import { useProjectStore } from "@/zustand/useProjectStore";
+import { AnimatePresence, motion } from "framer-motion";
+import { CheckCircle, Loader2, Sparkles, Trophy, XCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
 // Assume the `info` object from your store has this shape for each stage
 interface StageInfo {
@@ -141,7 +133,7 @@ export function MultiStageLoaderComplete({
       // Cleanup function to clear the timer if the component unmounts prematurely
       return () => clearTimeout(timer);
     }
-  }, [info?.fileSync, projectId, hasError, showSuccessNotification]); // Dependency array is now cleaner
+  }, [info?.fileSync, projectId, hasError, showSuccessNotification, router]); // Dependency array is now cleaner
 
   const retry = () => {
     setHasError(false);

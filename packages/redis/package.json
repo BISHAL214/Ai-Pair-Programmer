@@ -6,5 +6,9 @@
   "type": "module",
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "@upstash/redis": "^1.35.3",
+    "bullmq": "^5.59.0"
   }
 }

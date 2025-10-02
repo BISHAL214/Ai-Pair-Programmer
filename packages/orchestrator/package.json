@@ -7,5 +7,12 @@
   "main": "containerManager.ts",
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "dockerode": "^4.0.7",
+    "zod": "^4.1.11"
+  },
+  "devDependencies": {
+    "@types/dockerode": "^3.3.44"
   }
 }

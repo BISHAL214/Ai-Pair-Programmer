@@ -8,11 +8,20 @@
     "clear:queue": "bun run --hot src/clear-queue.ts"
   },
   "dependencies": {
+    "@hono/node-server": "^1.19.5",
+    "@hono/swagger-ui": "^0.5.2",
+    "@supabase/supabase-js": "^2.58.0",
+    "bullmq": "^5.59.0",
     "dotenv": "^17.2.1",
     "hono": "^4.8.10",
+    "jzip": "^1.0.0",
+    "simple-git": "^3.28.0",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
     "zod": "^4.0.13"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/unzipper": "^0.10.11"
   }
 }

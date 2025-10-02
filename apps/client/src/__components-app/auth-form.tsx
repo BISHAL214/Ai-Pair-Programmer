@@ -1,15 +1,14 @@
 'use client'
 
-import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { createSupabaseBrowserClient } from '@ai_pair_programmer/supabse-client'
-import { cn } from '@/lib/utils'
-import { Github, Mail, Loader2 } from 'lucide-react'
 import { supabaseAnonKey, supabaseUrl } from '@/constants'
+import { createSupabaseBrowserClient } from '@ai_pair_programmer/supabse-client'
+import { motion } from 'framer-motion'
+import { Github, Loader2, Mail } from 'lucide-react'
+import { useState } from 'react'
 
 type AuthFormProps = {
   mode: 'login' | 'signup'

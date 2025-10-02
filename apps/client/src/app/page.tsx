@@ -1,12 +1,8 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { useProjectSocket } from "@/hooks/use-projectSocket";
+import { AnimatedAIChat } from "@/__components-app/ai-chatInput";
+import PixelBlast from "@/__components-app/pixel-blast";
+import { NavigationBar } from "@/components/asternity/navbar";
 import { useAuth } from "@/lib/auth";
 import {
   extractGithubFiles,
@@ -16,15 +12,8 @@ import {
 import { handleZipUpload } from "@/lib/upload-zip";
 import { INFO, useProjectStore } from "@/zustand/useProjectStore";
 import { useQuery } from "@tanstack/react-query";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { NavigationBar } from "@/components/asternity/navbar";
-import { BackgroundBeams } from "@/components/asternity/background-beams";
-import { MultiStageLoaderComplete } from "@/__components-app/project-loader";
-import { AnimatedAIChat } from "@/__components-app/ai-chatInput";
-import PixelBlast from "@/__components-app/pixel-blast";
+import { useEffect, useState } from "react";
 
 export default function Page() {
   const router = useRouter();
@@ -43,11 +32,9 @@ export default function Page() {
   );
 
   const { setProjectUserId, setInfo, info, projectId } = useProjectStore();
-  useProjectSocket();
+  //   useProjectSocket();
 
   const handleLogout = () => supabase.auth.signOut();
-
-  console.log(session);
 
   // ✅ GitHub repos
   const { data: repos = [] } = useQuery({
@@ -100,46 +87,6 @@ export default function Page() {
     }
   }, [extractJob, setProjectUserId, setInfo]);
 
-  // ✅ Define stages
-  // const stages = useMemo(
-  //   () => [
-  //     {
-  //       key: "extraction",
-  //       title: "Extracting Project",
-  //       subtitle: "Analyzing repository & preparing files...",
-  //     },
-  //     {
-  //       key: "container",
-  //       title: "Creating Environment",
-  //       subtitle: "Spinning up Docker container...",
-  //     },
-  //     {
-  //       key: "fileSync",
-  //       title: "Syncing Files",
-  //       subtitle: "Finalizing project workspace...",
-  //     },
-  //     {
-  //       key: "done",
-  //       title: "All Set!",
-  //       subtitle: "Redirecting to your workspace...",
-  //     },
-  //   ],
-  //   []
-  // );
-  // const [stageIndex, setStageIndex] = useState(0);
-  // ⏳ Fake progression using setTimeout
-  // useEffect(() => {
-  //   if (stageIndex < stages.length - 1) {
-  //     const timer = setTimeout(() => {
-  //       setStageIndex((prev) => prev + 1);
-  //     }, 40000); // change stage every 2s
-
-  //     return () => clearTimeout(timer);
-  //   }
-  // }, [stageIndex]);
-
-  // ✅ Determine current stage
-
   const handleConnectGitHub = () => {
     supabase.auth.signInWithOAuth({
       provider: "github",
@@ -187,27 +134,6 @@ export default function Page() {
   };
 
   if (loading) return <p>Loading...</p>;
-
-  // ✅ Animated stages screen
-  // if (isTheChatStarted) {
-  //   if (currentStage === null) {
-  //     return (
-  //       <StageScreen title="Starting..." subtitle="Preparing project..." />
-  //     );
-  //   }
-  //   if (currentStage === "done") {
-  //     return (
-  //       <StageScreen
-  //         title="Workspace Ready"
-  //         subtitle="Redirecting to editor..."
-  //         success
-  //       />
-  //     );
-  //   }
-
-  //   const stage = stages.find((s) => s.key === currentStage);
-  //   return <StageScreen title={stage?.title!} subtitle={stage?.subtitle!} />;
-  // }
 
   // ✅ Main UI
   return (
@@ -289,7 +215,7 @@ export default function Page() {
         selectRepo={setSelectedRepo}
         selectedRepo={selectedRepo}
       />
-      <div className="w-full h-[800px] absolute hidden dark:block">
+      <div className="w-full h-[100vh] absolute hidden dark:block">
         <PixelBlast
           variant="circle"
           pixelSize={6}

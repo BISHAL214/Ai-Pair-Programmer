@@ -2,25 +2,14 @@
 
 import { AuthProvider } from "@/lib/auth";
 import ReactQueryClientProviders from "@/lib/query-client";
-import {
-  SpacemanThemeProvider,
-  ThemeAnimationType,
-} from "@space-man/react-theme-animation";
+import { ThemeProvider } from "next-themes";
 import React from "react";
 
 const Providers = ({ children }: { children: React.ReactNode }) => {
   return (
-    //  <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-    <AuthProvider>
-      <ReactQueryClientProviders>
-        <SpacemanThemeProvider
-          defaultTheme="system"
-          defaultColorTheme="blue"
-          themes={["light", "dark", "system"]}
-          colorThemes={["default", "blue", "green", "purple"]}
-          animationType={ThemeAnimationType.BLUR_CIRCLE}
-          duration={800}
-        >
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <AuthProvider>
+        <ReactQueryClientProviders>
           <div className="min-h-screen w-full relative">
             {/* Aurora Dream Diagonal Flow */}
 
@@ -103,9 +92,9 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
             </div> */}
             {children}
           </div>
-        </SpacemanThemeProvider>
-      </ReactQueryClientProviders>
-    </AuthProvider>
+        </ReactQueryClientProviders>
+      </AuthProvider>
+    </ThemeProvider>
   );
 };
 
