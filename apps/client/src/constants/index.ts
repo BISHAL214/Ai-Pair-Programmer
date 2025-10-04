@@ -7,3 +7,5 @@ export const githubCallbackUrl =
   process.env.NEXT_PUBLIC_GITHUB_CALLBACK_URL || "";
 
 export const serverUrl = process.env.NEXT_PUBLIC_SERVER_API_URL || "";
+
+const GITHUB_API_BASE_URL = "https://api.github.com";

@@ -1,5 +1,5 @@
 "use client";
-import { cn } from "@/lib/utils";
+import { cn, supabase } from "@/lib/utils";
 import { AnimatedThemeToggler } from "@/themes/theme-toggler";
 import type { User } from "@supabase/supabase-js";
 import { IconMenu2, IconX } from "@tabler/icons-react";
@@ -14,10 +14,12 @@ import { BorderBeam } from "@/__components-app/border-trail";
 import { Menu, X } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { Button } from "../ui/button";
-import { Avatar } from "../ui/avatar";
+import { Avatar, AvatarFallback } from "../ui/avatar";
 import { AvatarImage } from "@radix-ui/react-avatar";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { useAuth } from "@/hooks/use-auth";
+import { Skeleton } from "../ui/skeleton";
 
 interface NavbarProps {
   children: React.ReactNode;
@@ -380,16 +382,11 @@ export const NavbarButton = ({
 //   { name: "About", href: "#about" },
 // ]
 
-export function NavigationBar({
-  user,
-  handleLogout,
-}: {
-  user: User | null;
-  handleLogout: () => void;
-}) {
+export function NavigationBar({ handleLogout }: { handleLogout: () => void }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
+  const { user, isLoading } = useAuth(supabase);
 
   const navItems = [
     { name: "Home", link: "/" },
@@ -443,14 +440,28 @@ export function NavigationBar({
 
               {user ? (
                 <React.Fragment>
-                  <Avatar>
-                    <AvatarImage
-                      src={
-                        user?.user_metadata?.avatar_url || "/placeholder.svg"
-                      }
-                      alt="User Avatar"
-                    />
-                  </Avatar>
+                  {isLoading ? (
+                    <Skeleton className="h-12 w-12 rounded-full" />
+                  ) : (
+                    <Avatar>
+                      <AvatarImage
+                        src={
+                          user?.user_metadata?.avatar_url || "/placeholder.svg"
+                        }
+                        alt={`${user?.user_metadata?.full_name || "User"}'s Avatar`}
+                      />
+                      <AvatarFallback>
+                        {
+                          (
+                            user?.user_metadata?.full_name
+                              ?.split(" ")
+                              .map((n: string) => n[0]) || ["U"]
+                          ).join("") // Fallback to initials
+                        }
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
+
                   <Button
                     size="sm"
                     className="bg-white/10 hover:bg-white/20 z-10 border border-white/20 shadow-2xl cursor-pointer text-white rounded-full"

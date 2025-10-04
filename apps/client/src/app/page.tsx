@@ -2,14 +2,18 @@
 
 import { AnimatedAIChat } from "@/__components-app/ai-chatInput";
 import PixelBlast from "@/__components-app/pixel-blast";
+import { TextShimmer } from "@/__components-app/text-shimmer";
 import { NavigationBar } from "@/components/asternity/navbar";
-import { useAuth } from "@/lib/auth";
+import { useAuth } from "@/hooks/use-auth";
+// import { useAuth } from "@/lib/auth";
 import {
   extractGithubFiles,
   fetchGitHubBranches,
   fetchGitHubRepos,
 } from "@/lib/github";
 import { handleZipUpload } from "@/lib/upload-zip";
+import { supabase } from "@/lib/utils";
+import { authMutaions } from "@/tanstack/mutations/auth.mutations";
 import { INFO, useProjectStore } from "@/zustand/useProjectStore";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -17,7 +21,7 @@ import { useEffect, useState } from "react";
 
 export default function Page() {
   const router = useRouter();
-  const { user, loading, supabase, session } = useAuth();
+  const { user, isLoading, session, isAuthenticated } = useAuth(supabase);
   const githubToken = session?.provider_token ?? null;
   const isGitHubConnected = !!githubToken;
 
@@ -34,7 +38,16 @@ export default function Page() {
   const { setProjectUserId, setInfo, info, projectId } = useProjectStore();
   //   useProjectSocket();
 
-  const handleLogout = () => supabase.auth.signOut();
+  console.log(user);
+
+  const {
+    mutate: logout,
+    //  isPending: isLogoutLoading,
+    //  error: logoutError,
+  } = authMutaions.authLogoutMutation({ router });
+  const handleLogout = () => {
+    logout();
+  };
 
   // ✅ GitHub repos
   const { data: repos = [] } = useQuery({
@@ -133,80 +146,17 @@ export default function Page() {
     setZipUploadFormData(formData);
   };
 
-  if (loading) return <p>Loading...</p>;
-
   // ✅ Main UI
   return (
     <div className="min-h-screen relative flex flex-col">
-      <NavigationBar user={user} handleLogout={handleLogout} />
-
-      {/* Chat + Upload */}
-      {/* <main className="flex flex-1 justify-center items-center p-6 bg-gray-800"> */}
-      {/*   <Card className="w-full max-w-2xl p-4 shadow-lg border rounded-2xl z-10"> */}
-      {/*     <CardContent className="flex flex-col gap-4"> */}
-      {/*       <Textarea */}
-      {/*         placeholder="Type your message here..." */}
-      {/*         className="h-32" */}
-      {/*       /> */}
-      {/*       <div className="flex gap-4"> */}
-      {/*         <Button onClick={handleChatStarted}>Send</Button> */}
-      {/*         <Input */}
-      {/*           onChange={handleZipInputChange} */}
-      {/*           type="file" */}
-      {/*           accept=".zip" */}
-      {/*           className="cursor-pointer" */}
-      {/*         /> */}
-      {/*       </div> */}
-      {/**/}
-      {/*       {!isGitHubConnected ? ( */}
-      {/*         <Button onClick={handleConnectGitHub}>Connect GitHub</Button> */}
-      {/*       ) : ( */}
-      {/*         <> */}
-      {/*           <Label className="mt-4">Select GitHub Repo</Label> */}
-      {/*           <select */}
-      {/*             onChange={(e) => setSelectedRepo(JSON.parse(e.target.value))} */}
-      {/*             className="border p-2 rounded" */}
-      {/*             value={selectedRepo ? JSON.stringify(selectedRepo) : ""} */}
-      {/*           > */}
-      {/*             <option value="">Select a repo...</option> */}
-      {/*             {repos.map((repo: any) => ( */}
-      {/*               <option */}
-      {/*                 className="bg-gray-700" */}
-      {/*                 key={repo.id} */}
-      {/*                 value={JSON.stringify(repo)} */}
-      {/*               > */}
-      {/*                 {repo.name} */}
-      {/*               </option> */}
-      {/*             ))} */}
-      {/*           </select> */}
-      {/**/}
-      {/*           {branches.length > 0 && ( */}
-      {/*             <> */}
-      {/*               <Label className="mt-4">Select Branches</Label> */}
-      {/*               <div className="flex flex-col gap-1"> */}
-      {/*                 {branches.map((branch: any) => ( */}
-      {/*                   <label */}
-      {/*                     key={branch.name} */}
-      {/*                     className="flex items-center gap-2" */}
-      {/*                   > */}
-      {/*                     <Checkbox */}
-      {/*                       checked={selectedBranches.includes(branch.name)} */}
-      {/*                       onCheckedChange={() => toggleBranch(branch.name)} */}
-      {/*                     /> */}
-      {/*                     {branch.name} */}
-      {/*                   </label> */}
-      {/*                 ))} */}
-      {/*               </div> */}
-      {/*             </> */}
-      {/*           )} */}
-      {/*         </> */}
-      {/*       )} */}
-      {/*     </CardContent> */}
-      {/*   </Card> */}
-      {/*   {isTheChatStarted && ( */}
-      {/*     <MultiStageLoaderComplete setIsTheChatStarted={setIsTheChatStarted} /> */}
-      {/*   )} */}
-      {/* </main> */}
+      {/* {isLoading && (
+        <div className="min-h-screen w-full flex justify-center items-center inset-0 bg-white/10 backdrop-blur-xs z-10">
+          <TextShimmer className="font-mono text-sm" duration={1}>
+            Authenticating...
+          </TextShimmer>
+        </div>
+      )} */}
+      <NavigationBar handleLogout={handleLogout} />
       <AnimatedAIChat
         handleGithubConnect={handleConnectGitHub}
         githubToken={githubToken}
@@ -215,7 +165,7 @@ export default function Page() {
         selectRepo={setSelectedRepo}
         selectedRepo={selectedRepo}
       />
-      <div className="w-full h-[100vh] absolute hidden dark:block">
+      {/* <div className="w-full h-[100vh] absolute hidden dark:block">
         <PixelBlast
           variant="circle"
           pixelSize={6}
@@ -235,7 +185,209 @@ export default function Page() {
           edgeFade={0.25}
           transparent
         />
-      </div>
+      </div> */}
     </div>
   );
+}
+
+{
+  /* Chat + Upload */
+}
+{
+  /* <main className="flex flex-1 justify-center items-center p-6 bg-gray-800"> */
+}
+{
+  /*   <Card className="w-full max-w-2xl p-4 shadow-lg border rounded-2xl z-10"> */
+}
+{
+  /*     <CardContent className="flex flex-col gap-4"> */
+}
+{
+  /*       <Textarea */
+}
+{
+  /*         placeholder="Type your message here..." */
+}
+{
+  /*         className="h-32" */
+}
+{
+  /*       /> */
+}
+{
+  /*       <div className="flex gap-4"> */
+}
+{
+  /*         <Button onClick={handleChatStarted}>Send</Button> */
+}
+{
+  /*         <Input */
+}
+{
+  /*           onChange={handleZipInputChange} */
+}
+{
+  /*           type="file" */
+}
+{
+  /*           accept=".zip" */
+}
+{
+  /*           className="cursor-pointer" */
+}
+{
+  /*         /> */
+}
+{
+  /*       </div> */
+}
+{
+  /**/
+}
+{
+  /*       {!isGitHubConnected ? ( */
+}
+{
+  /*         <Button onClick={handleConnectGitHub}>Connect GitHub</Button> */
+}
+{
+  /*       ) : ( */
+}
+{
+  /*         <> */
+}
+{
+  /*           <Label className="mt-4">Select GitHub Repo</Label> */
+}
+{
+  /*           <select */
+}
+{
+  /*             onChange={(e) => setSelectedRepo(JSON.parse(e.target.value))} */
+}
+{
+  /*             className="border p-2 rounded" */
+}
+{
+  /*             value={selectedRepo ? JSON.stringify(selectedRepo) : ""} */
+}
+{
+  /*           > */
+}
+{
+  /*             <option value="">Select a repo...</option> */
+}
+{
+  /*             {repos.map((repo: any) => ( */
+}
+{
+  /*               <option */
+}
+{
+  /*                 className="bg-gray-700" */
+}
+{
+  /*                 key={repo.id} */
+}
+{
+  /*                 value={JSON.stringify(repo)} */
+}
+{
+  /*               > */
+}
+{
+  /*                 {repo.name} */
+}
+{
+  /*               </option> */
+}
+{
+  /*             ))} */
+}
+{
+  /*           </select> */
+}
+{
+  /**/
+}
+{
+  /*           {branches.length > 0 && ( */
+}
+{
+  /*             <> */
+}
+{
+  /*               <Label className="mt-4">Select Branches</Label> */
+}
+{
+  /*               <div className="flex flex-col gap-1"> */
+}
+{
+  /*                 {branches.map((branch: any) => ( */
+}
+{
+  /*                   <label */
+}
+{
+  /*                     key={branch.name} */
+}
+{
+  /*                     className="flex items-center gap-2" */
+}
+{
+  /*                   > */
+}
+{
+  /*                     <Checkbox */
+}
+{
+  /*                       checked={selectedBranches.includes(branch.name)} */
+}
+{
+  /*                       onCheckedChange={() => toggleBranch(branch.name)} */
+}
+{
+  /*                     /> */
+}
+{
+  /*                     {branch.name} */
+}
+{
+  /*                   </label> */
+}
+{
+  /*                 ))} */
+}
+{
+  /*               </div> */
+}
+{
+  /*             </> */
+}
+{
+  /*           )} */
+}
+{
+  /*         </> */
+}
+{
+  /*       )} */
+}
+{
+  /*     </CardContent> */
+}
+{
+  /*   </Card> */
+}
+{
+  /*   {isTheChatStarted && ( */
+}
+{
+  /*     <MultiStageLoaderComplete setIsTheChatStarted={setIsTheChatStarted} /> */
+}
+{
+  /*   )} */
+}
+{
+  /* </main> */
 }

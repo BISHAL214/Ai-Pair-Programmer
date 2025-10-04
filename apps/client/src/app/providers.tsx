@@ -4,96 +4,235 @@ import { AuthProvider } from "@/lib/auth";
 import ReactQueryClientProviders from "@/lib/query-client";
 import { ThemeProvider } from "next-themes";
 import React from "react";
+import { Toaster } from "react-hot-toast";
+import { useInitializeAuthListener } from "@/hooks/use-auth";
 
 const Providers = ({ children }: { children: React.ReactNode }) => {
+  useInitializeAuthListener();
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <AuthProvider>
-        <ReactQueryClientProviders>
-          <div className="min-h-screen w-full relative">
-            {/* Aurora Dream Diagonal Flow */}
-
-            <div
-              className="absolute inset-0 z-0 dark:hidden"
-              style={{
-                backgroundImage: `
-        linear-gradient(180deg,
-          rgba(245,245,220,1) 0%,
-          rgba(255,223,186,0.8) 25%,
-          rgba(255,182,193,0.6) 50%,
-          rgba(147,112,219,0.7) 75%,
-          rgba(72,61,139,0.9) 100%
-        ),
-        radial-gradient(circle at 30% 20%, rgba(255,255,224,0.4) 0%, transparent 50%),
-        radial-gradient(circle at 70% 80%, rgba(72,61,139,0.6) 0%, transparent 70%),
-        radial-gradient(circle at 50% 60%, rgba(147,112,219,0.3) 0%, transparent 60%)
-      `,
-              }}
-            />
-
-            {/* <div
-              className="absolute inset-0 z-0 dark:hidden"
-              style={{
-                background: `
-          radial-gradient(ellipse 80% 60% at 5% 40%, rgba(175, 109, 255, 0.48), transparent 67%),
-         radial-gradient(ellipse 70% 60% at 45% 45%, rgba(255, 100, 180, 0.41), transparent 67%),
-         radial-gradient(ellipse 62% 52% at 83% 76%, rgba(255, 235, 170, 0.44), transparent 63%),
-         radial-gradient(ellipse 60% 48% at 75% 20%, rgba(120, 190, 255, 0.36), transparent 66%),
-         linear-gradient(45deg, #f7eaff 0%, #fde2ea 100%)
-        `,
-              }}
-            /> */}
-
-            {/* <div
-              className="absolute inset-0 dark:hidden"
-              style={{
-                backgroundImage: `
-        linear-gradient(45deg, transparent 49%, #e5e7eb 49%, #e5e7eb 51%, transparent 51%),
-        linear-gradient(-45deg, transparent 49%, #e5e7eb 49%, #e5e7eb 51%, transparent 51%)
-      `,
-                backgroundSize: "40px 40px",
-                WebkitMaskImage:
-                  "radial-gradient(ellipse 80% 80% at 0% 100%, #000 50%, transparent 90%)",
-                maskImage:
-                  "radial-gradient(ellipse 80% 80% at 0% 100%, #000 50%, transparent 90%)",
-              }}
-            /> */}
-
-            {/* <div
-              className="absolute inset-0 z-0 hidden dark:block"
-              style={{
+      <Toaster position="bottom-left" reverseOrder={false} />
+      <ReactQueryClientProviders>
+        <div className="min-h-screen w-full relative">
+          {/* Sequential Color Light-up Animation */}
+          {/* <div
+            className="absolute inset-0 z-0 pointer-events-none"
+            style={{
+              background: "transparent",
+              animation: "sequentialLightUp 800ms cubic-bezier(0.4, 0, 0.2, 1) forwards",
+            }}
+          />
+          <style jsx>{`
+            @keyframes sequentialLightUp {
+              0% {
+                background: radial-gradient(
+                  ellipse 120% 80% at 20% 30%,
+                  transparent 0%,
+                  transparent 100%
+                );
+              }
+              20% {
+                background: radial-gradient(
+                  ellipse 120% 80% at 20% 30%,
+                  rgba(239, 68, 68, 0.8) 0%,
+                  rgba(239, 68, 68, 0.3) 30%,
+                  transparent 60%
+                );
+              }
+              40% {
                 background:
-                  "radial-gradient(ellipse 50% 100% at 10% 0%, rgba(226, 232, 240, 0.15), transparent 65%), #000000",
-              }}
-            /> */}
+                  radial-gradient(
+                    ellipse 120% 80% at 20% 30%,
+                    rgba(239, 68, 68, 0.6) 0%,
+                    rgba(239, 68, 68, 0.2) 25%,
+                    transparent 50%
+                  ),
+                  radial-gradient(
+                    ellipse 120% 80% at 50% 20%,
+                    rgba(59, 130, 246, 0.8) 0%,
+                    rgba(59, 130, 246, 0.3) 30%,
+                    transparent 60%
+                  );
+              }
+              60% {
+                background:
+                  radial-gradient(
+                    ellipse 120% 80% at 20% 30%,
+                    rgba(239, 68, 68, 0.4) 0%,
+                    rgba(239, 68, 68, 0.1) 25%,
+                    transparent 50%
+                  ),
+                  radial-gradient(
+                    ellipse 120% 80% at 50% 20%,
+                    rgba(59, 130, 246, 0.6) 0%,
+                    rgba(59, 130, 246, 0.2) 25%,
+                    transparent 50%
+                  ),
+                  radial-gradient(
+                    ellipse 120% 80% at 80% 30%,
+                    rgba(34, 197, 94, 0.8) 0%,
+                    rgba(34, 197, 94, 0.3) 30%,
+                    transparent 60%
+                  );
+              }
+              80% {
+                background:
+                  radial-gradient(
+                    ellipse 120% 80% at 20% 30%,
+                    rgba(239, 68, 68, 0.3) 0%,
+                    rgba(239, 68, 68, 0.1) 25%,
+                    transparent 50%
+                  ),
+                  radial-gradient(
+                    ellipse 120% 80% at 50% 20%,
+                    rgba(59, 130, 246, 0.4) 0%,
+                    rgba(59, 130, 246, 0.1) 25%,
+                    transparent 50%
+                  ),
+                  radial-gradient(
+                    ellipse 120% 80% at 80% 30%,
+                    rgba(34, 197, 94, 0.6) 0%,
+                    rgba(34, 197, 94, 0.2) 25%,
+                    transparent 50%
+                  ),
+                  linear-gradient(
+                    135deg,
+                    rgba(255, 255, 255, 0.9) 0%,
+                    rgba(248, 250, 252, 0.7) 100%
+                  );
+              }
+              100% {
+                background:
+                  linear-gradient(
+                    135deg,
+                    rgba(239, 68, 68, 0.15) 0%,
+                    rgba(59, 130, 246, 0.2) 30%,
+                    rgba(34, 197, 94, 0.15) 60%,
+                    rgba(255, 255, 255, 0.95) 80%,
+                    rgba(248, 250, 252, 0.9) 100%
+                  ),
+                  radial-gradient(
+                    ellipse at top,
+                    rgba(59, 130, 246, 0.1) 0%,
+                    transparent 70%
+                  );
+              }
+            }
 
-            {/* Your content goes here */}
-            {/* <BackgroundBeams className="hidden dark:block" /> */}
-            {/* <div className="w-full h-[1500px] absolute hidden dark:block">
-              <PixelBlast
-                variant="circle"
-                pixelSize={6}
-                color="#B19EEF"
-                patternScale={3}
-                patternDensity={1.2}
-                pixelSizeJitter={0.5}
-                enableRipples
-                rippleSpeed={0.4}
-                rippleThickness={0.12}
-                rippleIntensityScale={1.5}
-                liquid
-                liquidStrength={0.12}
-                liquidRadius={1.2}
-                liquidWobbleSpeed={5}
-                speed={0.6}
-                edgeFade={0.25}
-                transparent
-              />
-            </div> */}
-            {children}
-          </div>
-        </ReactQueryClientProviders>
-      </AuthProvider>
+            .dark @keyframes sequentialLightUp {
+              0% {
+                background: radial-gradient(
+                  ellipse 120% 80% at 20% 30%,
+                  transparent 0%,
+                  transparent 100%
+                );
+              }
+              20% {
+                background: radial-gradient(
+                  ellipse 120% 80% at 20% 30%,
+                  rgba(239, 68, 68, 0.6) 0%,
+                  rgba(239, 68, 68, 0.2) 30%,
+                  transparent 60%
+                );
+              }
+              40% {
+                background:
+                  radial-gradient(
+                    ellipse 120% 80% at 20% 30%,
+                    rgba(239, 68, 68, 0.4) 0%,
+                    rgba(239, 68, 68, 0.1) 25%,
+                    transparent 50%
+                  ),
+                  radial-gradient(
+                    ellipse 120% 80% at 50% 20%,
+                    rgba(59, 130, 246, 0.6) 0%,
+                    rgba(59, 130, 246, 0.2) 30%,
+                    transparent 60%
+                  );
+              }
+              60% {
+                background:
+                  radial-gradient(
+                    ellipse 120% 80% at 20% 30%,
+                    rgba(239, 68, 68, 0.3) 0%,
+                    rgba(239, 68, 68, 0.08) 25%,
+                    transparent 50%
+                  ),
+                  radial-gradient(
+                    ellipse 120% 80% at 50% 20%,
+                    rgba(59, 130, 246, 0.4) 0%,
+                    rgba(59, 130, 246, 0.1) 25%,
+                    transparent 50%
+                  ),
+                  radial-gradient(
+                    ellipse 120% 80% at 80% 30%,
+                    rgba(34, 197, 94, 0.6) 0%,
+                    rgba(34, 197, 94, 0.2) 30%,
+                    transparent 60%
+                  );
+              }
+              80% {
+                background:
+                  radial-gradient(
+                    ellipse 120% 80% at 20% 30%,
+                    rgba(239, 68, 68, 0.2) 0%,
+                    rgba(239, 68, 68, 0.05) 25%,
+                    transparent 50%
+                  ),
+                  radial-gradient(
+                    ellipse 120% 80% at 50% 20%,
+                    rgba(59, 130, 246, 0.3) 0%,
+                    rgba(59, 130, 246, 0.08) 25%,
+                    transparent 50%
+                  ),
+                  radial-gradient(
+                    ellipse 120% 80% at 80% 30%,
+                    rgba(34, 197, 94, 0.4) 0%,
+                    rgba(34, 197, 94, 0.1) 25%,
+                    transparent 50%
+                  ),
+                  linear-gradient(
+                    135deg,
+                    rgba(17, 24, 39, 0.95) 0%,
+                    rgba(31, 41, 55, 0.9) 100%
+                  );
+              }
+              100% {
+                background:
+                  linear-gradient(
+                    135deg,
+                    rgba(239, 68, 68, 0.08) 0%,
+                    rgba(59, 130, 246, 0.12) 30%,
+                    rgba(34, 197, 94, 0.08) 60%,
+                    rgba(17, 24, 39, 0.98) 80%,
+                    rgba(31, 41, 55, 0.95) 100%
+                  ),
+                  radial-gradient(
+                    ellipse at top,
+                    rgba(59, 130, 246, 0.05) 0%,
+                    transparent 70%
+                  );
+              }
+            }
+          `}</style> */}
+          {/* // backgroundImage: ` // linear-gradient(180deg, //
+          rgba(245,245,220,1) 0%, // rgba(255,223,186,0.8) 25%, //
+          rgba(255,182,193,0.6) 50%, // rgba(147,112,219,0.7) 75%, //
+          rgba(72,61,139,0.9) 100% // ), // radial-gradient(circle at 30% 20%,
+          rgba(255,255,224,0.4) 0%, transparent 50%), // radial-gradient(circle
+          at 70% 80%, rgba(72,61,139,0.6) 0%, transparent 70%), //
+          radial-gradient(circle at 50% 60%, rgba(147,112,219,0.3) 0%,
+          transparent 60%) // `, */}
+          <div
+            className="absolute inset-0 z-0 dark:hidden"
+            style={{
+              backgroundImage:
+                "linear-gradient(to top, #3f51b1 0%, #5a55ae 13%, #7b5fac 25%, #8f6aae 38%, #a86aa4 50%, #cc6b8e 62%, #f18271 75%, #f3a469 87%, #f7c978 100%)",
+            }}
+          />
+          {children}
+        </div>
+      </ReactQueryClientProviders>
     </ThemeProvider>
   );
 };
