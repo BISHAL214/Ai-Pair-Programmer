@@ -1,3 +1,11 @@
+/**
+ * @file This file provides a set of reusable components for creating charts with `recharts`.
+ * It includes a context provider for chart configurations, and custom components for tooltips and legends
+ * that are styled to match the application's design system.
+ * @requires react
+ * @requires recharts
+ * @requires @/lib/utils
+ */
 "use client"
 
 import * as React from "react"
@@ -8,6 +16,13 @@ import { cn } from "@/lib/utils"
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: "", dark: ".dark" } as const
 
+/**
+ * @typedef {object} ChartConfig - Defines the configuration for a chart's data series.
+ * @property {React.ReactNode} [label] - The display label for the data series.
+ * @property {React.ComponentType} [icon] - An icon component for the data series.
+ * @property {string} [color] - A static color for the data series.
+ * @property {Record<keyof typeof THEMES, string>} [theme] - Theme-specific colors for the data series.
+ */
 export type ChartConfig = {
   [k in string]: {
     label?: React.ReactNode
@@ -24,6 +39,11 @@ type ChartContextProps = {
 
 const ChartContext = React.createContext<ChartContextProps | null>(null)
 
+/**
+ * A custom hook to access the chart configuration from the `ChartContext`.
+ * @throws {Error} If used outside of a `ChartContainer`.
+ * @returns {ChartContextProps} The chart configuration.
+ */
 function useChart() {
   const context = React.useContext(ChartContext)
 
@@ -34,6 +54,16 @@ function useChart() {
   return context
 }
 
+/**
+ * A container component for charts that provides a context with the chart configuration
+ * and sets up a responsive container for the chart.
+ * @param {object} props - The component props.
+ * @param {string} [props.id] - An optional ID for the chart.
+ * @param {string} [props.className] - Additional CSS classes.
+ * @param {ChartConfig} props.config - The configuration for the chart.
+ * @param {React.ReactNode} props.children - The chart components to be rendered.
+ * @returns {JSX.Element} The rendered ChartContainer component.
+ */
 function ChartContainer({
   id,
   className,
@@ -69,6 +99,14 @@ function ChartContainer({
   )
 }
 
+/**
+ * A component that generates and injects a `<style>` tag with CSS variables
+ * for the chart's colors based on the provided configuration.
+ * @param {object} props - The component props.
+ * @param {string} props.id - The unique ID of the chart.
+ * @param {ChartConfig} props.config - The chart configuration.
+ * @returns {JSX.Element | null} The rendered style tag or null if no colors are configured.
+ */
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(
     ([, config]) => config.theme || config.color
@@ -102,8 +140,21 @@ ${colorConfig
   )
 }
 
+/**
+ * A wrapper around the `recharts` Tooltip component.
+ */
 const ChartTooltip = RechartsPrimitive.Tooltip
 
+/**
+ * A custom content component for the chart tooltip, providing styling and layout.
+ * @param {object} props - The component props, extending `recharts` Tooltip props.
+ * @param {boolean} [props.hideLabel] - Whether to hide the tooltip label.
+ * @param {boolean} [props.hideIndicator] - Whether to hide the color indicator.
+ * @param {"line" | "dot" | "dashed"} [props.indicator="dot"] - The style of the color indicator.
+ * @param {string} [props.nameKey] - The key to use for the item name.
+ * @param {string} [props.labelKey] - The key to use for the tooltip label.
+ * @returns {JSX.Element | null} The rendered tooltip content or null if not active.
+ */
 function ChartTooltipContent({
   active,
   payload,
@@ -248,8 +299,18 @@ function ChartTooltipContent({
   )
 }
 
+/**
+ * A wrapper around the `recharts` Legend component.
+ */
 const ChartLegend = RechartsPrimitive.Legend
 
+/**
+ * A custom content component for the chart legend.
+ * @param {object} props - The component props.
+ * @param {boolean} [props.hideIcon=false] - Whether to hide the legend item's icon.
+ * @param {string} [props.nameKey] - The key to use for the legend item's name.
+ * @returns {JSX.Element | null} The rendered legend content or null if there is no data.
+ */
 function ChartLegendContent({
   className,
   hideIcon = false,
@@ -304,7 +365,14 @@ function ChartLegendContent({
   )
 }
 
-// Helper to extract item config from a payload.
+/**
+ * A helper function to extract an item's configuration from the chart config
+ * based on the data payload from `recharts`.
+ * @param {ChartConfig} config - The chart's configuration object.
+ * @param {unknown} payload - The payload object from `recharts`.
+ * @param {string} key - The key to look for in the payload.
+ * @returns {object | undefined} The configuration for the item, or undefined if not found.
+ */
 function getPayloadConfigFromPayload(
   config: ChartConfig,
   payload: unknown,

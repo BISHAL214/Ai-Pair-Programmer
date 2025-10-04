@@ -1,3 +1,19 @@
+/**
+ * @file This file contains functions for extracting files from Git repositories and zip archives,
+ * uploading them to Supabase Storage, and storing metadata in a database.
+ * @requires dotenv
+ * @requires @ai_pair_programmer/db
+ * @requires @supabase/supabase-js
+ * @requires fs/promises
+ * @requires node:crypto
+ * @requires node:os
+ * @requires node:path
+ * @requires simple-git
+ * @requires unzipper
+ * @requires ./inngest/utils/inngestEventProducer
+ * @requires ./queue
+ * @requires jszip
+ */
 import * as dotenv from "dotenv";
 dotenv.config({ path: "../../.env" });
 
@@ -16,12 +32,20 @@ import JsZip from "jszip";
 const supabase_url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabase_service_role_key = process.env.SERVICE_ROLE_KEY!;
 
+/**
+ * Supabase client instance for server-side operations.
+ * @type {SupabaseClient}
+ */
 export const createSupabaseServerClient: SupabaseClient = createClient(
   supabase_url,
   supabase_service_role_key
 );
 
-// --- Project detection helpers ---
+/**
+ * Detects the project type based on the file name.
+ * @param {string} file - The name of the file.
+ * @returns {string | null} The detected project type or null if not detected.
+ */
 function detectProjectType(file: string): string | null {
   const patterns: Record<string, RegExp[]> = {
     node: [/package\.json$/],
@@ -40,6 +64,11 @@ function detectProjectType(file: string): string | null {
   return null;
 }
 
+/**
+ * Maps a project type to a list of required tools.
+ * @param {string} type - The project type.
+ * @returns {string[]} An array of tool names.
+ */
 function mapTypeToTools(type: string): string[] {
   switch (type) {
     case "node":
@@ -63,6 +92,17 @@ function mapTypeToTools(type: string): string[] {
   }
 }
 
+/**
+ * Clones a Git repository, extracts files from specified branches, uploads them as a zip,
+ * and stores file metadata in the database. It also detects project type and required tools.
+ * @param {string} repoUrl - The URL of the Git repository.
+ * @param {string} repoName - The name of the repository.
+ * @param {string} userId - The ID of the user.
+ * @param {string[]} branches - An array of branch names to extract.
+ * @param {string} token - The authentication token for the Git repository.
+ * @param {string} projectId - The ID of the project.
+ * @returns {Promise<void>} A promise that resolves when the process is complete.
+ */
 export async function extractFilesFromGitAndUpload(
   repoUrl: string,
   repoName: string,
@@ -95,19 +135,6 @@ export async function extractFilesFromGitAndUpload(
         const extension = path.extname(relativePath).slice(1);
         supaPath = `projects/${projectId}/${branch}/${relativePath}`;
         zip.file(`${branch}/${relativePath}`, content);
-        // Upload to Supabase Storage
-        //   await createSupabaseServerClient.storage
-        //     .from("projects")
-        //     .upload(supaPath, content, {
-        //       contentType: "text/plain",
-        //       upsert: true,
-        //     })
-        //     .then(() => {
-        //       console.log(`Uploaded ${supaPath} to Supabase Storage`);
-        //     })
-        //     .catch((error) => {
-        //       console.error(`Failed to upload ${supaPath}:`, error);
-        //     });
 
         // Store in Supabase DB
         await db
@@ -191,6 +218,16 @@ export async function extractFilesFromGitAndUpload(
   }
 }
 
+/**
+ * Extracts files from an uploaded zip archive, uploads them to Supabase Storage,
+ * and stores file metadata in the database.
+ * @param {string} zipPath - The path to the uploaded zip file.
+ * @param {string} userId - The ID of the user.
+ * @param {string} projectName - The name of the project.
+ * @param {string} projectId - The ID of the project.
+ * @returns {Promise<void>} A promise that resolves when the process is complete.
+ * @throws {Error} If there is an error extracting the zip file.
+ */
 export async function extractFileFromUploadedZip(
   zipPath: string,
   userId: string,
@@ -202,7 +239,6 @@ export async function extractFileFromUploadedZip(
   await fs.mkdir(tmpDir, { recursive: true });
 
   try {
-    // ✅ CORRECT: Use `await` instead of `.then()`
     const directory = await unzipper.Open.file(zipPath);
 
     await Promise.all(
@@ -282,6 +318,13 @@ export async function extractFileFromUploadedZip(
   }
 }
 
+/**
+ * Recursively walks through a directory and returns a list of all file paths relative to a base directory.
+ * It excludes the `.git` directory.
+ * @param {string} dir - The directory to start walking from.
+ * @param {string} baseDir - The base directory to calculate relative paths from.
+ * @returns {Promise<string[]>} A promise that resolves to an array of relative file paths.
+ */
 async function walkFiles(dir: string, baseDir: string): Promise<string[]> {
   const entries = await fs.readdir(dir, { withFileTypes: true });
   const files = await Promise.all(

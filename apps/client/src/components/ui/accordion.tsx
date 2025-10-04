@@ -1,3 +1,12 @@
+/**
+ * @file This file defines a set of accessible and customizable Accordion components.
+ * It is built on top of Radix UI's Accordion primitive for robust functionality
+ * and is styled with Tailwind CSS.
+ * @requires react
+ * @requires @radix-ui/react-accordion
+ * @requires lucide-react
+ * @requires @/lib/utils
+ */
 "use client"
 
 import * as React from "react"
@@ -6,12 +15,23 @@ import { ChevronDownIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * The root component for the accordion, which contains all the accordion items.
+ * @param {React.ComponentProps<typeof AccordionPrimitive.Root>} props - The component props.
+ * @returns {JSX.Element} The rendered Accordion root component.
+ */
 function Accordion({
   ...props
 }: React.ComponentProps<typeof AccordionPrimitive.Root>) {
   return <AccordionPrimitive.Root data-slot="accordion" {...props} />
 }
 
+/**
+ * An individual item within the accordion, containing a trigger and content.
+ * @param {React.ComponentProps<typeof AccordionPrimitive.Item>} props - The component props.
+ * @param {string} [props.className] - Additional CSS classes.
+ * @returns {JSX.Element} The rendered AccordionItem component.
+ */
 function AccordionItem({
   className,
   ...props
@@ -25,6 +45,14 @@ function AccordionItem({
   )
 }
 
+/**
+ * The button that toggles the display of an accordion item's content.
+ * Includes a chevron icon that rotates based on the open/closed state.
+ * @param {React.ComponentProps<typeof AccordionPrimitive.Trigger>} props - The component props.
+ * @param {string} [props.className] - Additional CSS classes.
+ * @param {React.ReactNode} props.children - The content of the trigger button.
+ * @returns {JSX.Element} The rendered AccordionTrigger component.
+ */
 function AccordionTrigger({
   className,
   children,
@@ -47,6 +75,13 @@ function AccordionTrigger({
   )
 }
 
+/**
+ * The content panel of an accordion item, which is collapsible.
+ * @param {React.ComponentProps<typeof AccordionPrimitive.Content>} props - The component props.
+ * @param {string} [props.className] - Additional CSS classes.
+ * @param {React.ReactNode} props.children - The content to be displayed.
+ * @returns {JSX.Element} The rendered AccordionContent component.
+ */
 function AccordionContent({
   className,
   children,

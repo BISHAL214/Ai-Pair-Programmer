@@ -1,3 +1,11 @@
+/**
+ * @file This file defines a customizable Checkbox component.
+ * It is built on top of Radix UI's Checkbox primitive and is styled with Tailwind CSS.
+ * @requires react
+ * @requires @radix-ui/react-checkbox
+ * @requires lucide-react
+ * @requires @/lib/utils
+ */
 "use client"
 
 import * as React from "react"
@@ -6,6 +14,13 @@ import { CheckIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * A styled checkbox component that supports a checked and unchecked state.
+ * It includes a check icon that appears when the checkbox is checked.
+ * @param {React.ComponentProps<typeof CheckboxPrimitive.Root>} props - The component props.
+ * @param {string} [props.className] - Additional CSS classes.
+ * @returns {JSX.Element} The rendered Checkbox component.
+ */
 function Checkbox({
   className,
   ...props

@@ -79,9 +79,22 @@
 
 // export default page;
 
+/**
+ * @file This file defines the authentication page for the application.
+ * It provides a user interface for logging in, with options for email/password
+ * and social login (Google). It includes a form with validation and links for
+ * password recovery and account creation.
+ * @requires @/components/ui/button
+ * @requires @/components/ui/form
+ * @requires @/components/ui/input
+ * @requires @/components/ui/separator
+ * @requires @hookform/resolvers/zod
+ * @requires next/link
+ * @requires react-hook-form
+ * @requires zod
+ */
 "use client";
 
-// import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -98,11 +111,22 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+/**
+ * The Zod schema for the login form.
+ * It validates the email and password fields.
+ * @type {z.ZodObject<{email: z.ZodString, password: z.ZodString}>}
+ */
 const formSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8, "Password must be at least 8 characters long"),
 });
 
+/**
+ * The login page component.
+ * It renders a form for users to log in using their email and password,
+ * or with their Google account.
+ * @returns {JSX.Element} The rendered login page.
+ */
 const Login01Page = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
@@ -112,6 +136,10 @@ const Login01Page = () => {
     resolver: zodResolver(formSchema),
   });
 
+  /**
+   * Handles the form submission.
+   * @param {z.infer<typeof formSchema>} data - The validated form data.
+   */
   const onSubmit = (data: z.infer<typeof formSchema>) => {
     console.log(data);
   };
@@ -119,9 +147,8 @@ const Login01Page = () => {
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="max-w-xs w-full flex flex-col items-center">
-        {/* <Logo className="h-9 w-9" /> */}
         <p className="mt-4 text-xl font-semibold tracking-tight">
-          Log in to Shadcn UI Blocks
+          Log in to AI Pair Programmer
         </p>
 
         <Button className="mt-8 w-full gap-3">
@@ -201,6 +228,10 @@ const Login01Page = () => {
   );
 };
 
+/**
+ * A component that renders the Google logo as an SVG.
+ * @returns {JSX.Element} The Google logo SVG.
+ */
 const GoogleLogo = () => (
   <svg
     width="1.2em"

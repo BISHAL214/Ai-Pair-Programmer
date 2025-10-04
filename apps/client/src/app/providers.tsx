@@ -1,3 +1,13 @@
+/**
+ * @file This file defines the main Providers component that wraps the entire application.
+ * It sets up context providers for theming, authentication, and data fetching,
+ * ensuring that these services are available to all child components. It also includes
+ * decorative background styles.
+ * @requires @/lib/auth
+ * @requires @/lib/query-client
+ * @requires next-themes
+ * @requires react
+ */
 "use client";
 
 import { AuthProvider } from "@/lib/auth";
@@ -5,14 +15,24 @@ import ReactQueryClientProviders from "@/lib/query-client";
 import { ThemeProvider } from "next-themes";
 import React from "react";
 
+/**
+ * A component that wraps the application with essential providers.
+ * This includes:
+ * - `ThemeProvider` for managing light and dark modes.
+ * - `AuthProvider` for handling user authentication state.
+ * - `ReactQueryClientProviders` for client-side data fetching and caching with TanStack Query.
+ * It also renders aesthetic background effects.
+ * @param {object} props - The properties for the component.
+ * @param {React.ReactNode} props.children - The child components to be rendered within the providers.
+ * @returns {JSX.Element} The application content wrapped with all necessary providers.
+ */
 const Providers = ({ children }: { children: React.ReactNode }) => {
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <AuthProvider>
         <ReactQueryClientProviders>
           <div className="min-h-screen w-full relative">
-            {/* Aurora Dream Diagonal Flow */}
-
+            {/* Decorative background gradient for the light theme. */}
             <div
               className="absolute inset-0 z-0 dark:hidden"
               style={{
@@ -30,66 +50,6 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
       `,
               }}
             />
-
-            {/* <div
-              className="absolute inset-0 z-0 dark:hidden"
-              style={{
-                background: `
-          radial-gradient(ellipse 80% 60% at 5% 40%, rgba(175, 109, 255, 0.48), transparent 67%),
-         radial-gradient(ellipse 70% 60% at 45% 45%, rgba(255, 100, 180, 0.41), transparent 67%),
-         radial-gradient(ellipse 62% 52% at 83% 76%, rgba(255, 235, 170, 0.44), transparent 63%),
-         radial-gradient(ellipse 60% 48% at 75% 20%, rgba(120, 190, 255, 0.36), transparent 66%),
-         linear-gradient(45deg, #f7eaff 0%, #fde2ea 100%)
-        `,
-              }}
-            /> */}
-
-            {/* <div
-              className="absolute inset-0 dark:hidden"
-              style={{
-                backgroundImage: `
-        linear-gradient(45deg, transparent 49%, #e5e7eb 49%, #e5e7eb 51%, transparent 51%),
-        linear-gradient(-45deg, transparent 49%, #e5e7eb 49%, #e5e7eb 51%, transparent 51%)
-      `,
-                backgroundSize: "40px 40px",
-                WebkitMaskImage:
-                  "radial-gradient(ellipse 80% 80% at 0% 100%, #000 50%, transparent 90%)",
-                maskImage:
-                  "radial-gradient(ellipse 80% 80% at 0% 100%, #000 50%, transparent 90%)",
-              }}
-            /> */}
-
-            {/* <div
-              className="absolute inset-0 z-0 hidden dark:block"
-              style={{
-                background:
-                  "radial-gradient(ellipse 50% 100% at 10% 0%, rgba(226, 232, 240, 0.15), transparent 65%), #000000",
-              }}
-            /> */}
-
-            {/* Your content goes here */}
-            {/* <BackgroundBeams className="hidden dark:block" /> */}
-            {/* <div className="w-full h-[1500px] absolute hidden dark:block">
-              <PixelBlast
-                variant="circle"
-                pixelSize={6}
-                color="#B19EEF"
-                patternScale={3}
-                patternDensity={1.2}
-                pixelSizeJitter={0.5}
-                enableRipples
-                rippleSpeed={0.4}
-                rippleThickness={0.12}
-                rippleIntensityScale={1.5}
-                liquid
-                liquidStrength={0.12}
-                liquidRadius={1.2}
-                liquidWobbleSpeed={5}
-                speed={0.6}
-                edgeFade={0.25}
-                transparent
-              />
-            </div> */}
             {children}
           </div>
         </ReactQueryClientProviders>

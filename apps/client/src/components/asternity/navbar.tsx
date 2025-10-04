@@ -1,3 +1,20 @@
+/**
+ * @file This file defines a comprehensive, responsive navigation bar for the application.
+ * It includes components for both desktop and mobile views, with animations and scroll effects.
+ * It handles user authentication status, theme toggling, and navigation links.
+ * @requires react
+ * @requires framer-motion
+ * @requires lucide-react
+ * @requires @tabler/icons-react
+ * @requires @supabase/supabase-js
+ * @requires next/navigation
+ * @requires next/image
+ * @requires @/lib/utils
+ * @requires @/themes/theme-toggler
+ * @requires @/__components-app/border-trail
+ * @requires ../ui/button
+ * @requires ../ui/avatar
+ */
 "use client";
 import { cn } from "@/lib/utils";
 import { AnimatedThemeToggler } from "@/themes/theme-toggler";
@@ -19,17 +36,34 @@ import { AvatarImage } from "@radix-ui/react-avatar";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
+/**
+ * @interface NavbarProps
+ * @property {React.ReactNode} children - The content to be rendered inside the navbar.
+ * @property {string} [className] - Optional CSS classes for styling.
+ */
 interface NavbarProps {
   children: React.ReactNode;
   className?: string;
 }
 
+/**
+ * @interface NavBodyProps
+ * @property {React.ReactNode} children - The content of the navbar body.
+ * @property {string} [className] - Optional CSS classes.
+ * @property {boolean} [visible] - Controls the visibility and styling based on scroll position.
+ */
 interface NavBodyProps {
   children: React.ReactNode;
   className?: string;
   visible?: boolean;
 }
 
+/**
+ * @interface NavItemsProps
+ * @property {Array<{name: string, link: string}>} items - An array of navigation item objects.
+ * @property {string} [className] - Optional CSS classes.
+ * @property {() => void} [onItemClick] - Optional click handler for navigation items.
+ */
 interface NavItemsProps {
   items: {
     name: string;
@@ -39,17 +73,35 @@ interface NavItemsProps {
   onItemClick?: () => void;
 }
 
+/**
+ * @interface MobileNavProps
+ * @property {React.ReactNode} children - The content of the mobile navbar.
+ * @property {string} [className] - Optional CSS classes.
+ * @property {boolean} [visible] - Controls visibility and styling based on scroll.
+ */
 interface MobileNavProps {
   children: React.ReactNode;
   className?: string;
   visible?: boolean;
 }
 
+/**
+ * @interface MobileNavHeaderProps
+ * @property {React.ReactNode} children - The content of the mobile navbar header.
+ * @property {string} [className] - Optional CSS classes.
+ */
 interface MobileNavHeaderProps {
   children: React.ReactNode;
   className?: string;
 }
 
+/**
+ * @interface MobileNavMenuProps
+ * @property {React.ReactNode} children - The content of the mobile menu.
+ * @property {string} [className] - Optional CSS classes.
+ * @property {boolean} isOpen - Whether the mobile menu is open.
+ * @property {() => void} onClose - Function to call when the menu should close.
+ */
 interface MobileNavMenuProps {
   children: React.ReactNode;
   className?: string;
@@ -57,6 +109,12 @@ interface MobileNavMenuProps {
   onClose: () => void;
 }
 
+/**
+ * A wrapper component for the navigation bar that detects scroll position
+ * to apply different styles.
+ * @param {NavbarProps} props - The component props.
+ * @returns {JSX.Element} The rendered Navbar wrapper.
+ */
 export const Navbar = ({ children, className }: NavbarProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollY } = useScroll({
@@ -73,7 +131,6 @@ export const Navbar = ({ children, className }: NavbarProps) => {
     <motion.div
       ref={ref}
       className={cn(
-        // switched to fixed to avoid space pushing
         "fixed top-2 inset-x-0 z-50 w-full",
         className
       )}
@@ -91,6 +148,12 @@ export const Navbar = ({ children, className }: NavbarProps) => {
   );
 };
 
+/**
+ * The main container for the desktop navigation bar content.
+ * It animates its appearance based on the scroll visibility.
+ * @param {NavBodyProps} props - The component props.
+ * @returns {JSX.Element} The rendered desktop navigation body.
+ */
 export const NavBody = ({ children, className, visible }: NavBodyProps) => {
   return (
     <motion.div
@@ -117,6 +180,11 @@ export const NavBody = ({ children, className, visible }: NavBodyProps) => {
   );
 };
 
+/**
+ * Renders the navigation links with a hover effect.
+ * @param {NavItemsProps} props - The component props.
+ * @returns {JSX.Element} The rendered navigation items.
+ */
 export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
   const [hovered, setHovered] = useState<number | null>(null);
 
@@ -149,6 +217,12 @@ export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
   );
 };
 
+/**
+ * The main container for the mobile navigation bar.
+ * Animates based on scroll visibility.
+ * @param {MobileNavProps} props - The component props.
+ * @returns {JSX.Element} The rendered mobile navigation container.
+ */
 export const MobileNav = ({ children, className, visible }: MobileNavProps) => {
   return (
     <motion.div
@@ -178,6 +252,11 @@ export const MobileNav = ({ children, className, visible }: MobileNavProps) => {
   );
 };
 
+/**
+ * A container for the header of the mobile navigation bar.
+ * @param {MobileNavHeaderProps} props - The component props.
+ * @returns {JSX.Element} The rendered mobile navigation header.
+ */
 export const MobileNavHeader = ({
   children,
   className,
@@ -194,6 +273,12 @@ export const MobileNavHeader = ({
   );
 };
 
+/**
+ * A container for the mobile navigation menu that appears when toggled.
+ * It uses `AnimatePresence` to animate its entry and exit.
+ * @param {MobileNavMenuProps} props - The component props.
+ * @returns {JSX.Element | null} The rendered mobile navigation menu or null if closed.
+ */
 export const MobileNavMenu = ({
   children,
   className,
@@ -219,6 +304,13 @@ export const MobileNavMenu = ({
   );
 };
 
+/**
+ * A toggle button for the mobile navigation menu (hamburger/close icon).
+ * @param {object} props - The component props.
+ * @param {boolean} props.isOpen - Whether the menu is open.
+ * @param {() => void} props.onClick - The click handler for the toggle.
+ * @returns {JSX.Element} The rendered toggle icon.
+ */
 export const MobileNavToggle = ({
   isOpen,
   onClick,
@@ -233,6 +325,10 @@ export const MobileNavToggle = ({
   );
 };
 
+/**
+ * A component that renders the application logo for the navbar.
+ * @returns {JSX.Element} The rendered logo.
+ */
 export const NavbarLogo = () => {
   return (
     <a
@@ -250,6 +346,11 @@ export const NavbarLogo = () => {
   );
 };
 
+/**
+ * A versatile button component for the navbar that can be rendered as a button or an anchor tag.
+ * @param {object} props - The component props.
+ * @returns {JSX.Element} The rendered button or link.
+ */
 export const NavbarButton = ({
   href,
   as: Tag = "a",
@@ -290,96 +391,15 @@ export const NavbarButton = ({
   );
 };
 
-// export const NavigationBar = ({
-//   user,
-//   handleLogout,
-// }: {
-//   user: User | null;
-//   handleLogout: () => void;
-// }) => {
-//   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(true);
-
-//   const navItems = [
-//     { name: "Home", link: "/" },
-//     { name: "Features", link: "/features" },
-//     { name: "Pricing", link: "/pricing" },
-//     { name: "About", link: "/about" },
-//   ];
-
-//   return (
-//     <Navbar>
-//       <NavBody className="flex items-center justify-between">
-//         <NavbarLogo />
-//         <NavItems items={navItems} />
-//         <div className="flex items-center space-x-2">
-//           <AnimatedThemeToggler className="z-50" />
-//           {/* <NavbarButton>
-//             <ThemeSelector colorThemes={["default", "supabase", "mono"]} />
-//           </NavbarButton> */}
-//           {user ? (
-//             <div className="flex items-center gap-2">
-//               <NavbarButton onClick={handleLogout} variant="secondary">
-//                 Logout
-//               </NavbarButton>
-//               <Avatar>
-//                 <AvatarImage
-//                   src={user?.user_metadata?.avatar_url || "/placeholder.svg"}
-//                   alt="User Avatar"
-//                 />
-//               </Avatar>
-//             </div>
-//           ) : (
-//             <NavbarButton href="/auth" variant="gradient">
-//               Login
-//             </NavbarButton>
-//           )}
-//         </div>
-//       </NavBody>
-
-//       <MobileNav>
-//         <MobileNavHeader>
-//           <NavbarLogo />
-//           <MobileNavToggle
-//             isOpen={isMobileMenuOpen}
-//             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-//           />
-//         </MobileNavHeader>
-//         <MobileNavMenu
-//           isOpen={isMobileMenuOpen}
-//           onClose={() => setIsMobileMenuOpen(false)}
-//         >
-//           <NavItems
-//             items={navItems}
-//             onItemClick={() => setIsMobileMenuOpen(false)}
-//           />
-//           <NavbarButton
-//             href="/get-started"
-//             variant="gradient"
-//             className="w-full text-center"
-//             onClick={() => setIsMobileMenuOpen(false)}
-//           >
-//             Get Started
-//           </NavbarButton>
-//         </MobileNavMenu>
-//       </MobileNav>
-//     </Navbar>
-//   );
-// };
-
-// "use client"
-
-// import { useState, useEffect } from "react"
-// import { motion, AnimatePresence } from "framer-motion"
-// import { Menu, X } from "lucide-react"
-// import { Button } from "@/components/ui/button"
-
-// const navItems = [
-//   { name: "Home", href: "#home" },
-//   { name: "Features", href: "#features" },
-//   { name: "Pricing", href: "#pricing" },
-//   { name: "About", href: "#about" },
-// ]
-
+/**
+ * The main navigation bar component that integrates all sub-components.
+ * It provides a fully responsive navigation experience for both desktop and mobile users.
+ * It handles user authentication state, showing login/logout buttons and user avatar accordingly.
+ * @param {object} props - The component props.
+ * @param {User | null} props.user - The current user object from Supabase, or null if not authenticated.
+ * @param {() => void} props.handleLogout - The function to call when the logout button is clicked.
+ * @returns {JSX.Element} The complete, responsive navigation bar.
+ */
 export function NavigationBar({
   user,
   handleLogout,
@@ -424,9 +444,6 @@ export function NavigationBar({
         <div className="backdrop-blur-md bg-white/10 dark:bg-white/10 rounded-full px-6 py-3 shadow-2xl">
           <div className="flex items-center justify-between gap-8">
             <div className="flex items-center gap-2">
-              {/* <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                <span className="text-white font-bold text-sm">A</span>
-              </div> */}
               <Image
                 src={"/logo.jpeg"}
                 alt="logo"

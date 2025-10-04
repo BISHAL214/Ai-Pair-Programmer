@@ -1,3 +1,12 @@
+/**
+ * @file This file defines a customizable Calendar component based on `react-day-picker`.
+ * It provides a styled and interactive date picker for the application.
+ * @requires react
+ * @requires lucide-react
+ * @requires react-day-picker
+ * @requires @/lib/utils
+ * @requires @/components/ui/button
+ */
 "use client"
 
 import * as React from "react"
@@ -11,6 +20,17 @@ import { DayButton, DayPicker, getDefaultClassNames } from "react-day-picker"
 import { cn } from "@/lib/utils"
 import { Button, buttonVariants } from "@/components/ui/button"
 
+/**
+ * A highly customizable calendar component built on top of `react-day-picker`.
+ * It supports custom styling, formatting, and components for a flexible date picking experience.
+ * @param {object} props - The component props, extending `react-day-picker`'s props.
+ * @param {string} [props.className] - Additional CSS classes for the calendar container.
+ * @param {object} [props.classNames] - Overrides for the internal class names of `react-day-picker`.
+ * @param {boolean} [props.showOutsideDays=true] - Whether to display days from previous and next months.
+ * @param {"label" | "dropdown"} [props.captionLayout="label"] - The layout for the month caption.
+ * @param {React.ComponentProps<typeof Button>["variant"]} [props.buttonVariant="ghost"] - The variant for navigation buttons.
+ * @returns {JSX.Element} The rendered Calendar component.
+ */
 function Calendar({
   className,
   classNames,
@@ -172,6 +192,12 @@ function Calendar({
   )
 }
 
+/**
+ * A custom button component for rendering each day in the calendar.
+ * It handles focus management and applies styles based on the day's state (e.g., selected, in a range).
+ * @param {React.ComponentProps<typeof DayButton>} props - The component props.
+ * @returns {JSX.Element} The rendered button for a calendar day.
+ */
 function CalendarDayButton({
   className,
   day,

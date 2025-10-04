@@ -1,7 +1,22 @@
+/**
+ * @file This file defines a reusable Input component for the application.
+ * It provides a styled text input field with support for various states like focus, disabled, and invalid.
+ * @requires react
+ * @requires @/lib/utils
+ */
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * A styled input component that wraps the standard HTML `<input>` element.
+ * It includes styles for different states such as focus, disabled, and invalid,
+ * and is built to be consistent with the application's design system.
+ * @param {React.ComponentProps<"input">} props - The component props, which are the same as the standard HTML input attributes.
+ * @param {string} [props.className] - Additional CSS classes to apply to the input.
+ * @param {string} [props.type] - The type of the input (e.g., "text", "password", "email").
+ * @returns {JSX.Element} The rendered Input component.
+ */
 function Input({ className, type, ...props }: React.ComponentProps<"input">) {
   return (
     <input

@@ -1,6 +1,14 @@
-// import * as dotenv from "dotenv";
-// dotenv.config({ path: "../../.env" });
-
+/**
+ * @file This file defines the BullMQ worker for synchronizing files from Supabase to a Docker container.
+ * It processes jobs from the `sync-supabase-to-container` queue, fetches a project's zip file
+ * from Supabase Storage, and extracts it into the appropriate running container.
+ * @requires @ai_pair_programmer/redis
+ * @requires bullmq
+ * @requires socket.io-client
+ * @requires dockerode
+ * @requires @ai_pair_programmer/orchestrator
+ * @requires @supabase/supabase-js
+ */
 import { connection } from "@ai_pair_programmer/redis";
 import { Worker } from "bullmq";
 import { io } from "socket.io-client";
@@ -9,6 +17,11 @@ import { ContainerManager } from "../../../../packages/orchestrator/containerMan
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
 console.log("👷 File Sync Worker started and waiting for jobs...");
+
+/**
+ * The Socket.IO client for communicating with the main server.
+ * @type {import("socket.io-client").Socket}
+ */
 const socketClient = io(
   process.env.SOCKET_SERVER_URL || "http://localhost:3001",
   {
@@ -18,12 +31,14 @@ const socketClient = io(
     reconnectionDelay: 2000,
   }
 );
+
 socketClient.on("connect", () => {
   console.log(
     "File Sync Worker connected to socket server with ID:",
     socketClient.id
   );
 });
+
 socketClient.on("connect_error", (err) => {
   console.error(
     "❌ File Sync Worker failed to connect to server via WebSocket:",
@@ -44,11 +59,23 @@ if (!supabase_url || !supabase_service_role_key) {
   throw new Error("Supabase URL or Service Role Key is not set in env vars");
 }
 
+/**
+ * The Supabase client for server-side interactions.
+ * @type {SupabaseClient}
+ */
 export const supabase: SupabaseClient = createClient(
   supabase_url,
   supabase_service_role_key
 );
 
+/**
+ * The BullMQ worker for the 'sync-supabase-to-container' queue.
+ * This worker handles the process of downloading a project's zip file from Supabase
+ * and extracting its contents into the designated Docker container's workspace.
+ * @param {string} "sync-supabase-to-container" - The name of the queue.
+ * @param {function} processor - The async job processing function.
+ * @param {object} options - The worker options.
+ */
 const worker = new Worker(
   "sync-supabase-to-container",
   async (job) => {
@@ -72,13 +99,9 @@ const worker = new Worker(
     const docker = containerManager.getDockerInstance();
     if (containerStatus === "running") {
       const container = docker.getContainer(containerId);
-      // const ngnixContainer = containerManager.startNginxProxy(userId);
       if (!container) {
         throw new Error(`Container with ID ${containerId} not found`);
       }
-      // if (!ngnixContainer) {
-      //   throw new Error(`Nginx Proxy Container not found`);
-      // }
 
       try {
         console.log(
@@ -94,12 +117,6 @@ const worker = new Worker(
           throw new Error("Failed to get signed URL for zip file");
         }
 
-        //   const proxyUrl = data.signedUrl?.replace(
-        //     "https://mpgobcyypxiriumryrdu.supabase.co",
-        //     `http://aipp-nginx-${userId}/supabase/${zipPath}`
-        //   );
-
-        //   console.log("proxy-URL ->>>>", proxyUrl);
         const cmd = [
           "bash",
           "-c",
@@ -112,10 +129,10 @@ const worker = new Worker(
           AttachStderr: true,
         });
 
-        const stream = await exec.start({}); // later: hijack: true, stdin: false
+        const stream = await exec.start({});
         container.modem.demuxStream(stream, process.stdout, process.stderr);
 
-        await new Promise((resolve, reject) => {
+        await new Promise<void>((resolve, reject) => {
           stream.on("end", resolve);
           stream.on("error", reject);
         });
@@ -132,12 +149,6 @@ const worker = new Worker(
         console.log(
           `✅ Files synced to container ${containerId} for job ${job.id}`
         );
-        //   (await ngnixContainer).stop().catch((err) => {
-        //     console.error("Failed to stop Nginx Proxy container:", err);
-        //   });
-        //   (await ngnixContainer).remove().catch((err) => {
-        //     console.error("Failed to remove Nginx Proxy container:", err);
-        //   });
       } catch (error) {
         console.error(
           `Failed to create command for container ${containerId}:`,
@@ -151,6 +162,13 @@ const worker = new Worker(
   },
   { connection, concurrency: 2 }
 );
+
+/**
+ * Event listener for job completion.
+ * Notifies the client via Socket.IO that the file sync is complete.
+ * @param {string} "completed" - The event name.
+ * @param {function} listener - The callback function.
+ */
 worker.on("completed", (job) => {
   console.log(`✅ Job ${job.id} completed`);
   const { userId, projectId, containerId } = job.data;
@@ -163,7 +181,6 @@ worker.on("completed", (job) => {
     socketClient.emit("fileSync", {
       status: "completed",
       jobId: job.id,
-      // containerId,
       room, // include the room in the payload
     });
     console.log(`Emitted file sync event for job ${job.id} to room ${room}`);
@@ -175,6 +192,12 @@ worker.on("completed", (job) => {
   }
 });
 
+/**
+ * Event listener for job failure.
+ * Logs the error to the console.
+ * @param {string} "failed" - The event name.
+ * @param {function} listener - The callback function.
+ */
 worker.on("failed", (job, err) => {
   console.error(`❌ Job ${job?.id} failed:`, err);
 });

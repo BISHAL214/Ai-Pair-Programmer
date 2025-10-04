@@ -1,8 +1,24 @@
+/**
+ * @file This file defines the BackgroundBeams component, a visual effect that creates
+ * an animated grid of light beams in the background. It is a client-side component
+ * that uses `motion` for animations and SVG for rendering the beams.
+ * @requires react
+ * @requires motion/react
+ * @requires @/lib/utils
+ */
 "use client";
 import React from "react";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 
+/**
+ * A React component that renders an animated background of moving light beams.
+ * It uses a predefined set of SVG paths and animates their gradients to create a dynamic,
+ * flowing effect. The component is memoized with `React.memo` to prevent unnecessary re-renders.
+ * @param {object} props - The properties for the component.
+ * @param {string} [props.className] - Optional additional CSS classes to apply to the component's container.
+ * @returns {JSX.Element} The rendered BackgroundBeams component.
+ */
 export const BackgroundBeams = React.memo(
   ({ className }: { className?: string }) => {
     const paths = [

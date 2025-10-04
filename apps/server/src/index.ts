@@ -1,3 +1,20 @@
+/**
+ * @file Main entry point for the Hono server application.
+ * This file sets up the server, defines API routes, and configures middleware.
+ * @requires dotenv-mono
+ * @requires hono
+ * @requires ./queue
+ * @requires hono/cors
+ * @requires bun
+ * @requires node:path
+ * @requires node:os
+ * @requires node:fs
+ * @requires @ai_pair_programmer/db
+ * @requires inngest/hono
+ * @requires @ai_pair_programmer/inngest
+ * @requires ./inngest/functions/waitForContainer
+ * @requires ./inngest/functions/startFileSync
+ */
 require("dotenv-mono").load({ path: "../../.env" });
 import { Hono } from "hono";
 import { extractQueue } from "./queue";
@@ -13,8 +30,20 @@ import { waitForContainer } from "./inngest/functions/waitForContainer";
 import { startFileSync } from "./inngest/functions/startFileSync";
 import { swaggerUI, SwaggerUI } from "@hono/swagger-ui";
 
+/**
+ * The main Hono application instance.
+ * @type {Hono}
+ */
 const app = new Hono();
 
+/**
+ * Middleware to handle Cross-Origin Resource Sharing (CORS).
+ * @param {string} "*" - The path to apply the middleware to.
+ * @param {object} options - CORS options.
+ * @param {string} options.origin - The allowed origin.
+ * @param {string[]} options.allowMethods - The allowed HTTP methods.
+ * @param {string[]} options.allowHeaders - The allowed HTTP headers.
+ */
 app.use(
   "*",
   cors({
@@ -24,17 +53,36 @@ app.use(
   })
 );
 
+/**
+ * Route for the root path.
+ * @param {string} "/" - The path.
+ * @param {function} handler - The route handler.
+ * @returns {Response} A text response.
+ */
 app.get("/", (c) => {
   return c.text("Hello Hono!");
 });
 
-// inngest route
+/**
+ * Inngest route for handling background jobs.
+ * @param {string[]} methods - The allowed HTTP methods.
+ * @param {string} path - The path for the Inngest API.
+ * @param {function} handler - The Inngest serve function.
+ */
 app.on(
   ["GET", "PUT", "POST"],
   "/api/inngest",
   serve({ client: inngest, functions: [waitForContainer, startFileSync] })
 );
 
+/**
+ * Endpoint to extract a GitHub repository.
+ * It receives repository information, creates a new project in the database,
+ * and adds a job to the extraction queue.
+ * @param {string} "/api/github-extract" - The path.
+ * @param {function} handler - The async route handler.
+ * @returns {Response} A JSON response with job information, project ID, and user ID.
+ */
 app.post("/api/github-extract", async (c) => {
   const body = await c.req.json();
   console.log("Received body:", body);
@@ -73,6 +121,14 @@ app.post("/api/github-extract", async (c) => {
   });
 });
 
+/**
+ * Endpoint to upload and extract a zip file.
+ * It receives a zip file, user ID, and project name, creates a new project,
+ * saves the zip file to a temporary location, and adds a job to the extraction queue.
+ * @param {string} "/api/upload-zip" - The path.
+ * @param {function} handler - The async route handler.
+ * @returns {Response} A JSON response with the job ID or an error message.
+ */
 app.post("/api/upload-zip", async (c) => {
   const formdata = await c.req.formData();
   console.log("from server", formdata);

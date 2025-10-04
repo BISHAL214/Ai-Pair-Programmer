@@ -1,5 +1,25 @@
+/**
+ * @file This file defines an Inngest function that waits for a container to be ready
+ * after a project has been extracted. It listens for `project_extracted` events and
+ * then waits for a corresponding `container_ready` event.
+ * @requires @ai_pair_programmer/inngest
+ */
 import { inngest } from "@ai_pair_programmer/inngest";
 
+/**
+ * An Inngest function that waits for a container to become ready.
+ * This function is triggered by the `project_extracted` event. It then waits for
+ * a `container_ready` event that matches the `userId` and `projectId` from the
+ * initial event. If the container becomes ready within the timeout, it sends a
+ * `sync_ready` event. If it times out, it sends a `sync.failed` event.
+ * @param {object} config - The function configuration.
+ * @param {string} config.id - The unique ID for this function.
+ * @param {object} trigger - The event that triggers this function.
+ * @param {string} trigger.event - The name of the trigger event.
+ * @param {function} handler - The async function to execute when the event is received.
+ * @param {object} handler.event - The event payload from the `project_extracted` event.
+ * @param {object} handler.step - The Inngest step control object.
+ */
 export const waitForContainer = inngest.createFunction(
   { id: "wait-for-container" },
   { event: "project_extracted" },

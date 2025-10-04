@@ -1,3 +1,10 @@
+/**
+ * @file This file defines a set of composable Avatar components for displaying user
+ * profile pictures or initials. It is built on top of Radix UI's Avatar primitive.
+ * @requires react
+ * @requires @radix-ui/react-avatar
+ * @requires @/lib/utils
+ */
 "use client"
 
 import * as React from "react"
@@ -5,6 +12,12 @@ import * as AvatarPrimitive from "@radix-ui/react-avatar"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * The root container for an avatar, which includes the image and a fallback.
+ * @param {React.ComponentProps<typeof AvatarPrimitive.Root>} props - The component props.
+ * @param {string} [props.className] - Additional CSS classes.
+ * @returns {JSX.Element} The rendered Avatar component.
+ */
 function Avatar({
   className,
   ...props
@@ -21,6 +34,12 @@ function Avatar({
   )
 }
 
+/**
+ * The image part of the avatar. This will be displayed if the image loads successfully.
+ * @param {React.ComponentProps<typeof AvatarPrimitive.Image>} props - The component props.
+ * @param {string} [props.className] - Additional CSS classes.
+ * @returns {JSX.Element} The rendered AvatarImage component.
+ */
 function AvatarImage({
   className,
   ...props
@@ -34,6 +53,13 @@ function AvatarImage({
   )
 }
 
+/**
+ * A fallback that is displayed if the avatar image fails to load.
+ * This can be used to show initials or a generic icon.
+ * @param {React.ComponentProps<typeof AvatarPrimitive.Fallback>} props - The component props.
+ * @param {string} [props.className] - Additional CSS classes.
+ * @returns {JSX.Element} The rendered AvatarFallback component.
+ */
 function AvatarFallback({
   className,
   ...props

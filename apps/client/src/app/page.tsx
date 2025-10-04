@@ -1,3 +1,19 @@
+/**
+ * @file This file defines the main page of the application.
+ * It serves as the primary interface for users to select a project source (GitHub or zip upload),
+ * initiate the project analysis, and view the results. It handles user authentication,
+ * GitHub API interactions, and state management for the project setup process.
+ * @requires @/__components-app/ai-chatInput
+ * @requires @/__components-app/pixel-blast
+ * @requires @/components/asternity/navbar
+ * @requires @/lib/auth
+ * @requires @/lib/github
+ * @requires @/lib/upload-zip
+ * @requires @/zustand/useProjectStore
+ * @requires @tanstack/react-query
+ * @requires next/navigation
+ * @requires react
+ */
 "use client";
 
 import { AnimatedAIChat } from "@/__components-app/ai-chatInput";
@@ -15,18 +31,49 @@ import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+/**
+ * The main page component of the application.
+ * This component allows users to:
+ * - Connect their GitHub account.
+ * - Select a repository and branches for analysis.
+ * - Upload a project as a zip file.
+ * - Start the analysis process which triggers background jobs.
+ * It uses `useAuth` for user authentication, `useQuery` for data fetching from GitHub,
+ * and `useProjectStore` to manage the state of the project analysis.
+ * @returns {JSX.Element} The rendered main page.
+ */
 export default function Page() {
   const router = useRouter();
   const { user, loading, supabase, session } = useAuth();
   const githubToken = session?.provider_token ?? null;
   const isGitHubConnected = !!githubToken;
 
+  /**
+   * State to hold the currently selected GitHub repository object.
+   * @type {[any | null, React.Dispatch<React.SetStateAction<any | null>>]}
+   */
   const [selectedRepo, setSelectedRepo] = useState<any | null>(null);
+  /**
+   * State to hold the array of selected branch names for the chosen repository.
+   * @type {[string[], React.Dispatch<React.SetStateAction<string[]>>]}
+   */
   const [selectedBranches, setSelectedBranches] = useState<string[]>([]);
+  /**
+   * State to track if the initial chat/analysis process has been started by the user.
+   * @type {[boolean, React.Dispatch<React.SetStateAction<boolean>>]}
+   */
   const [isTheChatStarted, setIsTheChatStarted] = useState(false);
+  /**
+   * State to determine the source of the project, either 'github' or 'zip'.
+   * @type {[ "github" | "zip" | "", React.Dispatch<React.SetStateAction<"github" | "zip" | "">>]}
+   */
   const [projectSourceType, setProjectSourceType] = useState<
     "github" | "zip" | ""
   >("");
+  /**
+   * State to hold the form data for a zip file upload.
+   * @type {[FormData | null, React.Dispatch<React.SetStateAction<FormData | null>>]}
+   */
   const [zipUploadFormData, setZipUploadFormData] = useState<FormData | null>(
     null
   );
@@ -34,9 +81,15 @@ export default function Page() {
   const { setProjectUserId, setInfo, info, projectId } = useProjectStore();
   //   useProjectSocket();
 
+  /**
+   * Handles user logout by signing them out of Supabase.
+   */
   const handleLogout = () => supabase.auth.signOut();
 
-  // ✅ GitHub repos
+  /**
+   * Fetches the list of the authenticated user's GitHub repositories.
+   * The query is enabled only if a GitHub token is available.
+   */
   const { data: repos = [] } = useQuery({
     queryKey: ["githubRepos"],
     queryFn: () => fetchGitHubRepos(githubToken!),
@@ -44,7 +97,10 @@ export default function Page() {
     staleTime: 1000 * 60 * 5,
   });
 
-  // ✅ GitHub branches
+  /**
+   * Fetches the branches for the selected GitHub repository.
+   * The query is enabled only if a GitHub token and a repository are selected.
+   */
   const { data: branches = [] } = useQuery({
     queryKey: ["githubBranches", selectedRepo?.full_name],
     queryFn: () =>
@@ -57,7 +113,10 @@ export default function Page() {
     staleTime: 1000 * 60 * 5,
   });
 
-  // ✅ Extraction job
+  /**
+   * Triggers the GitHub repository extraction job on the server.
+   * This query is only enabled when the chat is started and the project source is 'github'.
+   */
   const { data: extractJob } = useQuery<{
     jobInfo: INFO["extraction"] | null;
     projectId: string | null;
@@ -76,7 +135,10 @@ export default function Page() {
     staleTime: 1000 * 60 * 5,
   });
 
-  // ✅ Update store when job starts
+  /**
+   * Effect to update the project store with the extraction job details
+   * once the job has been created on the server.
+   */
   useEffect(() => {
     if (extractJob) {
       setProjectUserId(
@@ -87,6 +149,9 @@ export default function Page() {
     }
   }, [extractJob, setProjectUserId, setInfo]);
 
+  /**
+   * Initiates the GitHub OAuth flow for connecting a user's account.
+   */
   const handleConnectGitHub = () => {
     supabase.auth.signInWithOAuth({
       provider: "github",
@@ -94,6 +159,11 @@ export default function Page() {
     });
   };
 
+  /**
+   * Toggles the selection of a branch.
+   * Adds the branch to the list if not present, otherwise removes it.
+   * @param {string} branch - The name of the branch to toggle.
+   */
   const toggleBranch = (branch: string) =>
     setSelectedBranches((prev) =>
       prev.includes(branch)
@@ -101,6 +171,11 @@ export default function Page() {
         : [...prev, branch]
     );
 
+  /**
+   * Handles the start of the analysis process.
+   * It determines the project source type (GitHub or zip) and triggers the
+   * corresponding action.
+   */
   const handleChatStarted = async () => {
     if (selectedRepo && selectedBranches.length > 0) {
       setProjectSourceType("github");
@@ -116,6 +191,11 @@ export default function Page() {
     setIsTheChatStarted(true);
   };
 
+  /**
+   * Handles the change event for the zip file input.
+   * It validates the file type and sets the form data in the state.
+   * @param {React.ChangeEvent<HTMLInputElement>} e - The input change event.
+   */
   const handleZipInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (
@@ -135,78 +215,11 @@ export default function Page() {
 
   if (loading) return <p>Loading...</p>;
 
-  // ✅ Main UI
+  // The main UI is rendered here. It includes the navigation bar,
+  // the animated chat interface for project setup, and a background animation.
   return (
     <div className="min-h-screen relative flex flex-col">
       <NavigationBar user={user} handleLogout={handleLogout} />
-
-      {/* Chat + Upload */}
-      {/* <main className="flex flex-1 justify-center items-center p-6 bg-gray-800"> */}
-      {/*   <Card className="w-full max-w-2xl p-4 shadow-lg border rounded-2xl z-10"> */}
-      {/*     <CardContent className="flex flex-col gap-4"> */}
-      {/*       <Textarea */}
-      {/*         placeholder="Type your message here..." */}
-      {/*         className="h-32" */}
-      {/*       /> */}
-      {/*       <div className="flex gap-4"> */}
-      {/*         <Button onClick={handleChatStarted}>Send</Button> */}
-      {/*         <Input */}
-      {/*           onChange={handleZipInputChange} */}
-      {/*           type="file" */}
-      {/*           accept=".zip" */}
-      {/*           className="cursor-pointer" */}
-      {/*         /> */}
-      {/*       </div> */}
-      {/**/}
-      {/*       {!isGitHubConnected ? ( */}
-      {/*         <Button onClick={handleConnectGitHub}>Connect GitHub</Button> */}
-      {/*       ) : ( */}
-      {/*         <> */}
-      {/*           <Label className="mt-4">Select GitHub Repo</Label> */}
-      {/*           <select */}
-      {/*             onChange={(e) => setSelectedRepo(JSON.parse(e.target.value))} */}
-      {/*             className="border p-2 rounded" */}
-      {/*             value={selectedRepo ? JSON.stringify(selectedRepo) : ""} */}
-      {/*           > */}
-      {/*             <option value="">Select a repo...</option> */}
-      {/*             {repos.map((repo: any) => ( */}
-      {/*               <option */}
-      {/*                 className="bg-gray-700" */}
-      {/*                 key={repo.id} */}
-      {/*                 value={JSON.stringify(repo)} */}
-      {/*               > */}
-      {/*                 {repo.name} */}
-      {/*               </option> */}
-      {/*             ))} */}
-      {/*           </select> */}
-      {/**/}
-      {/*           {branches.length > 0 && ( */}
-      {/*             <> */}
-      {/*               <Label className="mt-4">Select Branches</Label> */}
-      {/*               <div className="flex flex-col gap-1"> */}
-      {/*                 {branches.map((branch: any) => ( */}
-      {/*                   <label */}
-      {/*                     key={branch.name} */}
-      {/*                     className="flex items-center gap-2" */}
-      {/*                   > */}
-      {/*                     <Checkbox */}
-      {/*                       checked={selectedBranches.includes(branch.name)} */}
-      {/*                       onCheckedChange={() => toggleBranch(branch.name)} */}
-      {/*                     /> */}
-      {/*                     {branch.name} */}
-      {/*                   </label> */}
-      {/*                 ))} */}
-      {/*               </div> */}
-      {/*             </> */}
-      {/*           )} */}
-      {/*         </> */}
-      {/*       )} */}
-      {/*     </CardContent> */}
-      {/*   </Card> */}
-      {/*   {isTheChatStarted && ( */}
-      {/*     <MultiStageLoaderComplete setIsTheChatStarted={setIsTheChatStarted} /> */}
-      {/*   )} */}
-      {/* </main> */}
       <AnimatedAIChat
         handleGithubConnect={handleConnectGitHub}
         githubToken={githubToken}

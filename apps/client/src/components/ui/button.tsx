@@ -1,9 +1,26 @@
+/**
+ * @file This file defines a reusable Button component for the application,
+ * featuring various visual styles and sizes. It is built using `class-variance-authority`
+ * for easy customization and polymorphism with Radix UI's Slot component.
+ * @requires react
+ * @requires @radix-ui/react-slot
+ * @requires class-variance-authority
+ * @requires @/lib/utils
+ */
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Defines the different variants and sizes for the button component using `cva`.
+ * This allows for a consistent and customizable button appearance throughout the application.
+ * @property {object} variants - The different styles and sizes for the button.
+ * @property {object} variants.variant - Defines the visual style of the button (e.g., default, destructive, outline).
+ * @property {object} variants.size - Defines the size of the button (e.g., default, sm, lg).
+ * @property {object} defaultVariants - The default variant and size to apply if not specified.
+ */
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
   {
@@ -35,6 +52,17 @@ const buttonVariants = cva(
   }
 )
 
+/**
+ * A polymorphic button component that can be rendered as a standard HTML button
+ * or as a child component, inheriting its properties.
+ * @param {object} props - The component props.
+ * @param {string} [props.className] - Additional CSS classes to apply to the button.
+ * @param {"default" | "destructive" | "outline" | "secondary" | "ghost" | "link"} [props.variant] - The visual style of the button.
+ * @param {"default" | "sm" | "lg" | "icon"} [props.size] - The size of the button.
+ * @param {boolean} [props.asChild=false] - If true, the component renders as its child element.
+ * @param {React.ComponentProps<"button">} ...props - Other props are passed down to the underlying button element.
+ * @returns {JSX.Element} The rendered Button component.
+ */
 function Button({
   className,
   variant,

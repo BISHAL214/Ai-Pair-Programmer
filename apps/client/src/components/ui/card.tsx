@@ -1,7 +1,20 @@
+/**
+ * @file This file defines a set of composable Card components.
+ * These components are used to display content in a structured and visually
+ * appealing card format, including a header, title, description, content area, and footer.
+ * @requires react
+ * @requires @/lib/utils
+ */
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * The main container for a card. It provides the basic structure and styling.
+ * @param {React.ComponentProps<"div">} props - The component props.
+ * @param {string} [props.className] - Additional CSS classes.
+ * @returns {JSX.Element} The rendered Card component.
+ */
 function Card({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -15,6 +28,12 @@ function Card({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
+/**
+ * The header section of a card. It typically contains the title and description.
+ * @param {React.ComponentProps<"div">} props - The component props.
+ * @param {string} [props.className] - Additional CSS classes.
+ * @returns {JSX.Element} The rendered CardHeader component.
+ */
 function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -28,6 +47,12 @@ function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
+/**
+ * The title of a card, intended to be used within a `CardHeader`.
+ * @param {React.ComponentProps<"div">} props - The component props.
+ * @param {string} [props.className] - Additional CSS classes.
+ * @returns {JSX.Element} The rendered CardTitle component.
+ */
 function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -38,6 +63,12 @@ function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
+/**
+ * The description of a card, intended to be used within a `CardHeader`.
+ * @param {React.ComponentProps<"div">} props - The component props.
+ * @param {string} [props.className] - Additional CSS classes.
+ * @returns {JSX.Element} The rendered CardDescription component.
+ */
 function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -48,6 +79,12 @@ function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
+/**
+ * A container for action elements (e.g., buttons, menus) within the `CardHeader`.
+ * @param {React.ComponentProps<"div">} props - The component props.
+ * @param {string} [props.className] - Additional CSS classes.
+ * @returns {JSX.Element} The rendered CardAction component.
+ */
 function CardAction({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -61,6 +98,12 @@ function CardAction({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
+/**
+ * The main content area of a card.
+ * @param {React.ComponentProps<"div">} props - The component props.
+ * @param {string} [props.className] - Additional CSS classes.
+ * @returns {JSX.Element} The rendered CardContent component.
+ */
 function CardContent({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -71,6 +114,12 @@ function CardContent({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
+/**
+ * The footer section of a card.
+ * @param {React.ComponentProps<"div">} props - The component props.
+ * @param {string} [props.className] - Additional CSS classes.
+ * @returns {JSX.Element} The rendered CardFooter component.
+ */
 function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
