@@ -14,7 +14,6 @@ const pool = new Pool({ connectionString });
 const db = drizzle(pool, { schema });
 export { db as default, schema };
 
-
 // const migrateDB = async() => {
 //   try {
 //     console.log("Starting database migration...");

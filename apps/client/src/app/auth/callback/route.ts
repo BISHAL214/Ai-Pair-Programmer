@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
 
   // return the user to an error page with instructions
   console.error(
-    "Authentication error: No code found or session exchange failed."
+    "Authentication error: No code found or session exchange failed.",
   );
   return NextResponse.redirect(`${origin}/auth/auth-code-error`);
 }

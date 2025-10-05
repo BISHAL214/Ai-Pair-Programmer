@@ -24,22 +24,26 @@ type AuthLogoutMutationProps = {
 
 export const authMutaions = {
   authFormMutation: ({ router }: AuthFormMutationProps) =>
-    useMutation<Session | null, AuthError, AuthActionArgs>({
+    useMutation<
+      { email: string; session: Session | null },
+      AuthError,
+      AuthActionArgs
+    >({
       mutationFn: ({ mode, values }) =>
         authActions.authFormAction({ mode, values, supabase }),
       // mutationKey: ["auth", mode],
-      onSuccess: (session: null | Session) => {
+      onSuccess: (data) => {
         //   queryClient.invalidateQueries({ queryKey: ["user"] });
         // For a faster UI update, we can set the query data directly
-        console.log("session on success:", session);
-        if (session) {
-          queryClient.setQueryData(["session"], session);
+        console.log("session on success:", data.session);
+        if (data.session) {
+          queryClient.setQueryData(["session"], data.session);
           router.push(`/`);
           return;
         }
 
         console.log("redirecting to verify page");
-        router.push(`/auth/verify`);
+        //   router.push(`/auth/verify`);
         //   toast.success(`${mode === "login" ? "Welcome back!" : "Welcome!"}`, {
         //     duration: 1500,
         //   });
@@ -47,7 +51,7 @@ export const authMutaions = {
         //     router.push("/");
         //     clearTimeout(time);
         //   }, 1500);
-        //   router.push(`/auth/verify?email=${session.user.email}`);
+        router.push(`/auth/verify?email=${data.email}`);
       },
       onError: (error) => {
         error instanceof AuthError
@@ -86,6 +90,7 @@ export const authMutaions = {
         //     router.push("/");
         //     clearTimeout(time);
         //   }, 1500);
+        router.push("/onboarding");
       },
       onError: (error) => {
         error instanceof Error

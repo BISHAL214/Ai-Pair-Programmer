@@ -32,7 +32,7 @@ export default function Page() {
     "github" | "zip" | ""
   >("");
   const [zipUploadFormData, setZipUploadFormData] = useState<FormData | null>(
-    null
+    null,
   );
 
   const { setProjectUserId, setInfo, info, projectId } = useProjectStore();
@@ -64,7 +64,7 @@ export default function Page() {
       fetchGitHubBranches(
         githubToken!,
         selectedRepo?.owner?.login,
-        selectedRepo?.name
+        selectedRepo?.name,
       ),
     enabled: !!githubToken && !!selectedRepo,
     staleTime: 1000 * 60 * 5,
@@ -83,7 +83,7 @@ export default function Page() {
         selectedRepo?.name,
         user?.id as string,
         selectedBranches,
-        githubToken!
+        githubToken!,
       ),
     enabled: isTheChatStarted && projectSourceType === "github",
     staleTime: 1000 * 60 * 5,
@@ -94,7 +94,7 @@ export default function Page() {
     if (extractJob) {
       setProjectUserId(
         extractJob.userId as string,
-        extractJob.projectId as string
+        extractJob.projectId as string,
       );
       setInfo("extraction", extractJob.jobInfo as INFO["extraction"]);
     }
@@ -111,7 +111,7 @@ export default function Page() {
     setSelectedBranches((prev) =>
       prev.includes(branch)
         ? prev.filter((b) => b !== branch)
-        : [...prev, branch]
+        : [...prev, branch],
     );
 
   const handleChatStarted = async () => {

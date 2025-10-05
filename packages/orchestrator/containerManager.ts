@@ -101,7 +101,7 @@ export class ContainerManager {
 
     await container.start();
     console.log(
-      `✅ Started Nginx proxy: ${containerName} on network ${networkName}`
+      `✅ Started Nginx proxy: ${containerName} on network ${networkName}`,
     );
     return container;
   }
@@ -189,7 +189,7 @@ export class ContainerManager {
 
   async ensureUserNetwork(
     userId: string,
-    isInitialNetworkChanging?: boolean
+    isInitialNetworkChanging?: boolean,
   ): Promise<string> {
     const networkName = `aipp_net_${userId}`;
 
@@ -211,7 +211,7 @@ export class ContainerManager {
           },
         });
         console.log(
-          `✅ Created network with internal false initially: ${networkName}`
+          `✅ Created network with internal false initially: ${networkName}`,
         );
       } else if (networks.length > 0 && isInitialNetworkChanging) {
         console.log(`✅ Network ${networkName} already exists`);
@@ -223,25 +223,25 @@ export class ContainerManager {
 
         if (connectedContainers.length > 0) {
           console.log(
-            `Disconnecting containers from network ${networkName}...`
+            `Disconnecting containers from network ${networkName}...`,
           );
           for (const containerId of connectedContainers) {
             try {
               const container = this.docker.getContainer(containerId);
               await network.disconnect({ Container: container.id });
               console.log(
-                `Disconnected container ${containerId} from network ${networkName}`
+                `Disconnected container ${containerId} from network ${networkName}`,
               );
             } catch (err) {
               console.error(
                 `Failed to disconnect container ${containerId}:`,
-                err
+                err,
               );
             }
           }
         } else {
           console.log(
-            `No containers to disconnect from network ${networkName}`
+            `No containers to disconnect from network ${networkName}`,
           );
         }
 
@@ -311,7 +311,7 @@ export class ContainerManager {
       });
 
       const containerInfo = containers.find((c) =>
-        c.Names?.some((name) => name.includes(containerName))
+        c.Names?.some((name) => name.includes(containerName)),
       );
 
       return containerInfo ? this.docker.getContainer(containerInfo.Id) : null;
@@ -397,7 +397,7 @@ export class ContainerManager {
   async startContainer(config: ContainerConfig): Promise<ContainerInfo> {
     const containerName = this.getContainerName(
       config.userId,
-      config.projectId
+      config.projectId,
     );
 
     let container = await this.findContainer(containerName);
@@ -464,7 +464,7 @@ export class ContainerManager {
   // Get container status[web:61]
   async getContainerStatus(
     userId: string,
-    projectId: string
+    projectId: string,
   ): Promise<ContainerInfo | null> {
     const containerName = this.getContainerName(userId, projectId);
     const container = await this.findContainer(containerName);

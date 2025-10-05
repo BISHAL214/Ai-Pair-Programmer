@@ -42,5 +42,5 @@ export const waitForContainer = inngest.createFunction(
         containerJobId: event.data.containerJobId,
       },
     });
-  }
+  },
 );

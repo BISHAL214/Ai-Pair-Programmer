@@ -16,18 +16,18 @@ const socketClient = io(
     reconnection: true,
     reconnectionAttempts: 5,
     reconnectionDelay: 2000,
-  }
+  },
 );
 socketClient.on("connect", () => {
   console.log(
     "File Sync Worker connected to socket server with ID:",
-    socketClient.id
+    socketClient.id,
   );
 });
 socketClient.on("connect_error", (err) => {
   console.error(
     "❌ File Sync Worker failed to connect to server via WebSocket:",
-    err
+    err,
   );
 });
 
@@ -37,7 +37,7 @@ const supabase_service_role_key = process.env.SERVICE_ROLE_KEY!;
 console.log("Supabase URL:", supabase_url ? "Loaded" : "Missing");
 console.log(
   "Supabase Service Role Key:",
-  supabase_service_role_key ? "Loaded" : "Missing"
+  supabase_service_role_key ? "Loaded" : "Missing",
 );
 
 if (!supabase_url || !supabase_service_role_key) {
@@ -46,7 +46,7 @@ if (!supabase_url || !supabase_service_role_key) {
 
 export const supabase: SupabaseClient = createClient(
   supabase_url,
-  supabase_service_role_key
+  supabase_service_role_key,
 );
 
 const worker = new Worker(
@@ -82,13 +82,13 @@ const worker = new Worker(
 
       try {
         console.log(
-          `Syncing files from Supabase path ${zipPath} to container ${containerId}...`
+          `Syncing files from Supabase path ${zipPath} to container ${containerId}...`,
         );
         const { data } = await supabase.storage
           .from("projects")
           .createSignedUrl(
             zipPath,
-            60 // URL valid for 60 seconds
+            60, // URL valid for 60 seconds
           );
         if (!data || !data.signedUrl) {
           throw new Error("Failed to get signed URL for zip file");
@@ -123,14 +123,14 @@ const worker = new Worker(
         // changing the network to internal true
         const networkName = await containerManager.ensureUserNetwork(
           userId,
-          true
+          true,
         );
         await docker
           .getNetwork(networkName)
           .connect({ Container: containerId });
 
         console.log(
-          `✅ Files synced to container ${containerId} for job ${job.id}`
+          `✅ Files synced to container ${containerId} for job ${job.id}`,
         );
         //   (await ngnixContainer).stop().catch((err) => {
         //     console.error("Failed to stop Nginx Proxy container:", err);
@@ -141,7 +141,7 @@ const worker = new Worker(
       } catch (error) {
         console.error(
           `Failed to create command for container ${containerId}:`,
-          error
+          error,
         );
       }
     }
@@ -149,7 +149,7 @@ const worker = new Worker(
     console.log(`✅ syncing files for job ${job.id} complete`);
     return { success: true };
   },
-  { connection, concurrency: 2 }
+  { connection, concurrency: 2 },
 );
 worker.on("completed", (job) => {
   console.log(`✅ Job ${job.id} completed`);
@@ -170,7 +170,7 @@ worker.on("completed", (job) => {
   } catch (error) {
     console.error(
       `❌ Failed to emit file sync event for job ${job.id}:`,
-      error
+      error,
     );
   }
 });

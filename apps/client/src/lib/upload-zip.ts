@@ -2,10 +2,8 @@ import { serverUrl } from "@/constants";
 import axios from "axios";
 
 // inside a form or component
-export const handleZipUpload = async (
-  formData: FormData
-) => {
-    console.log(formData)
+export const handleZipUpload = async (formData: FormData) => {
+  console.log(formData);
   try {
     const response = await axios.post(`${serverUrl}/upload-zip`, formData, {
       headers: {

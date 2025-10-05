@@ -11,7 +11,7 @@ export const authActions = {
     mode,
     values,
     supabase,
-  }: AuthActionArgs): Promise<Session | null> => {
+  }: AuthActionArgs): Promise<{ email: string; session: Session | null }> => {
     if (!supabase) {
       throw new Error("Supabase client is not defined.");
     }
@@ -27,7 +27,7 @@ export const authActions = {
           console.log("error signing up:", error);
           throw error;
         }
-        return null;
+        return { email, session: null };
       } else {
         const { email, password } = values as LoginFormValues;
         const {
@@ -39,7 +39,7 @@ export const authActions = {
         });
         if (error || !session)
           throw error || new Error("No session found. Please try again.");
-        return session;
+        return { email, session };
       }
     } catch (error) {
       if (error instanceof Error) {

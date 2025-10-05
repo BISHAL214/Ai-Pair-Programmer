@@ -59,7 +59,7 @@ export function MultiStageLoaderComplete({
         subtitle: "Redirecting to your workspace...",
       },
     ],
-    []
+    [],
   );
 
   // **FIX 1: Derive the current stage object directly from the store's `info` state.**
@@ -78,7 +78,7 @@ export function MultiStageLoaderComplete({
   // making the component's state consistent and predictable.
   const stageIndex = useMemo(
     () => stages.findIndex((s) => s.key === currentStage.key),
-    [currentStage, stages]
+    [currentStage, stages],
   );
 
   const completedStages = useMemo(() => {

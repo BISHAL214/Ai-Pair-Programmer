@@ -37,7 +37,7 @@ export class ConsumerManager {
     await consumer.run({
       eachMessage: async ({ topic, partition, message }) => {
         console.log(
-          `📥 [Consumer ${consumerId}] Group=${groupId} | Partition=${partition} | ${message.value?.toString()}`
+          `📥 [Consumer ${consumerId}] Group=${groupId} | Partition=${partition} | ${message.value?.toString()}`,
         );
       },
     });

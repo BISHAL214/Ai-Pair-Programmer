@@ -20,8 +20,8 @@ export const startFileSync = inngest.createFunction(
           tools: event.data.tools,
           monorepo: event.data.monorepo,
         },
-        { attempts: 5, removeOnComplete: true }
+        { attempts: 5, removeOnComplete: true },
       );
     });
-  }
+  },
 );

@@ -32,8 +32,8 @@ export const AuthForm = ({
   const [supabase] = useState(() =>
     createSupabaseBrowserClient(
       supabaseUrl as string,
-      supabaseAnonKey as string
-    )
+      supabaseAnonKey as string,
+    ),
   );
   const [activeProvider, setActiveProvider] = useState<Provider | null>(null);
 

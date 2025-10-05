@@ -43,12 +43,12 @@ function useAutoResizeTextarea({
       textarea.style.height = `${minHeight}px`;
       const newHeight = Math.max(
         minHeight,
-        Math.min(textarea.scrollHeight, maxHeight ?? Number.POSITIVE_INFINITY)
+        Math.min(textarea.scrollHeight, maxHeight ?? Number.POSITIVE_INFINITY),
       );
 
       textarea.style.height = `${newHeight}px`;
     },
-    [minHeight, maxHeight]
+    [minHeight, maxHeight],
   );
 
   useEffect(() => {
@@ -95,7 +95,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
             showRing
               ? "focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
               : "",
-            className
+            className,
           )}
           ref={ref}
           onFocus={() => setIsFocused(true)}
@@ -124,7 +124,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         )}
       </div>
     );
-  }
+  },
 );
 Textarea.displayName = "Textarea";
 
@@ -195,7 +195,7 @@ export function AnimatedAIChat({
       setShowCommandPalette(true);
 
       const matchingSuggestionIndex = commandSuggestions.findIndex((cmd) =>
-        cmd.prefix.startsWith(value)
+        cmd.prefix.startsWith(value),
       );
 
       if (matchingSuggestionIndex >= 0) {
@@ -265,12 +265,12 @@ export function AnimatedAIChat({
       if (e.key === "ArrowDown") {
         e.preventDefault();
         setActiveSuggestion((prev) =>
-          prev < commandSuggestions.length - 1 ? prev + 1 : 0
+          prev < commandSuggestions.length - 1 ? prev + 1 : 0,
         );
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
         setActiveSuggestion((prev) =>
-          prev > 0 ? prev - 1 : commandSuggestions.length - 1
+          prev > 0 ? prev - 1 : commandSuggestions.length - 1,
         );
       } else if (e.key === "Tab" || e.key === "Enter") {
         e.preventDefault();
@@ -395,7 +395,7 @@ export function AnimatedAIChat({
                           "flex items-center gap-2 px-3 py-2 text-xs transition-colors cursor-pointer",
                           activeSuggestion === index
                             ? "bg-white/10 text-white"
-                            : "text-white/70 hover:bg-white/5"
+                            : "text-white/70 hover:bg-white/5",
                         )}
                         onClick={() => selectCommandSuggestion(index)}
                         initial={{ opacity: 0 }}
@@ -437,7 +437,7 @@ export function AnimatedAIChat({
                   "text-white/90 text-sm",
                   "focus:outline-none",
                   "placeholder:text-white/20",
-                  "min-h-[60px]"
+                  "min-h-[60px]",
                 )}
                 style={{
                   overflow: "hidden",
@@ -500,7 +500,7 @@ export function AnimatedAIChat({
                   whileTap={{ scale: 0.94 }}
                   className={cn(
                     "p-2 text-white/40 hover:text-white/90 rounded-lg transition-colors relative group",
-                    showCommandPalette && "bg-white/10 text-white/90"
+                    showCommandPalette && "bg-white/10 text-white/90",
                   )}
                 >
                   <Command className="w-4 h-4" />
@@ -535,7 +535,7 @@ export function AnimatedAIChat({
                       whileTap={{ scale: 0.94 }}
                       className={cn(
                         "flex items-center gap-1 px-2 py-1.5 text-xs text-white/70 hover:text-white/90 rounded-lg transition-colors relative group border border-white/10",
-                        showRepoDropdown && "bg-white/10 text-white/90"
+                        showRepoDropdown && "bg-white/10 text-white/90",
                       )}
                     >
                       <Github className="w-3 h-3" />
@@ -571,7 +571,7 @@ export function AnimatedAIChat({
                   "flex items-center gap-2",
                   value.trim()
                     ? "bg-white text-[#0A0A0B] shadow-lg shadow-white/10"
-                    : "bg-white/[0.05] text-white/40"
+                    : "bg-white/[0.05] text-white/40",
                 )}
               >
                 {isTyping ? (

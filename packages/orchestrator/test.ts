@@ -23,7 +23,7 @@ async function testContainerLifecycle() {
     console.log("\n2️⃣  Checking status...");
     const status = await manager.getContainerStatus(
       config.userId,
-      config.projectId
+      config.projectId,
     );
     console.log("Status:", status);
 
@@ -40,7 +40,7 @@ async function testContainerLifecycle() {
     console.log("\n5️⃣  Checking status after stop...");
     const stoppedStatus = await manager.getContainerStatus(
       config.userId,
-      config.projectId
+      config.projectId,
     );
     console.log("Status:", stoppedStatus);
 
@@ -52,7 +52,7 @@ async function testContainerLifecycle() {
     console.log("\n7️⃣  Final status check...");
     const finalStatus = await manager.getContainerStatus(
       config.userId,
-      config.projectId
+      config.projectId,
     );
     console.log("Status:", finalStatus);
     console.log("\n✅ Container lifecycle test completed!");

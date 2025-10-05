@@ -57,7 +57,7 @@ export const AnimatedThemeToggler = ({ className }: Props) => {
     const y = top + height / 2;
     const maxRadius = Math.hypot(
       Math.max(left, window.innerWidth - left),
-      Math.max(top, window.innerHeight - top)
+      Math.max(top, window.innerHeight - top),
     );
 
     document.documentElement.animate(
@@ -71,7 +71,7 @@ export const AnimatedThemeToggler = ({ className }: Props) => {
         duration: 700,
         easing: "ease-in-out",
         pseudoElement: "::view-transition-new(root)",
-      }
+      },
     );
   }, [isDark]);
 

@@ -132,7 +132,7 @@ const createTouchTexture = () => {
 
 const createLiquidEffect = (
   texture: THREE.Texture,
-  opts?: { strength?: number; freq?: number }
+  opts?: { strength?: number; freq?: number },
 ) => {
   const fragment = `
     uniform sampler2D uTexture;
@@ -446,7 +446,7 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
         uClickPos: {
           value: Array.from(
             { length: MAX_CLICKS },
-            () => new THREE.Vector2(-1, -1)
+            () => new THREE.Vector2(-1, -1),
           ),
         },
         uClickTimes: { value: new Float32Array(MAX_CLICKS) },
@@ -482,12 +482,12 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
         renderer.setSize(w, h, false);
         uniforms.uResolution.value.set(
           renderer.domElement.width,
-          renderer.domElement.height
+          renderer.domElement.height,
         );
         if (threeRef.current?.composer)
           threeRef.current.composer.setSize(
             renderer.domElement.width,
-            renderer.domElement.height
+            renderer.domElement.height,
           );
         uniforms.uPixelSize.value = pixelSize * renderer.getPixelRatio();
       };
@@ -536,7 +536,7 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
               ["uTime", new THREE.Uniform(0)],
               ["uAmount", new THREE.Uniform(noiseAmount)],
             ]),
-          }
+          },
         );
         const noisePass = new EffectPass(camera, noiseEffect);
         noisePass.renderToScreen = true;
