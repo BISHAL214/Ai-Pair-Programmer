@@ -38,11 +38,11 @@ case "$COMMAND" in
         ;;
       client_dev)
         gum style --foreground 82 "▶ Starting client development server..."
-        cd apps/client && bun dev
+        bun dev --filter=client
         ;;
       server_dev)
         gum style --foreground 75 "▶ Starting server development server..."
-        cd apps/server && bun dev
+        bun dev --filter=server
         ;;
       *)
         gum style --foreground 196 "❌ Unknown dev command: $DEVCOMMAND"
