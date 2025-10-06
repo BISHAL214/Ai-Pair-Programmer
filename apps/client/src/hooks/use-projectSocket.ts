@@ -1,6 +1,7 @@
 "use client";
 
-import { useAuth } from "@/lib/auth";
+import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/lib/utils";
 import { INFO, useProjectStore } from "@/zustand/useProjectStore";
 import { useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
@@ -11,7 +12,7 @@ const SOCKET_SERVER_URL =
 // Custom hook to manage project-related WebSocket connections and events
 export function useProjectSocket() {
   const socketRef = useRef<Socket | null>(null);
-  const { user } = useAuth();
+  const { user } = useAuth(supabase);
   const { projectId, setInfo, userId } = useProjectStore();
 
   useEffect(() => {

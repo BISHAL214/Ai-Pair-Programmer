@@ -3,37 +3,54 @@ set -e
 
 # --- SCRIPT CONFIGURATION & DATA ---
 
-# Dynamically determine the project's root directory.
 PROJECT_ROOT=$(cd "$(dirname "$0")" && pwd)
 ORIGINAL_DIR=$(pwd)
 
-# SINGLE SOURCE OF TRUTH for all commands.
-# Format: "command:subcommand|Description|Shell command to execute"
-# To add a new command, just add a new line here. Everything else updates automatically.
 IFS=$'\n' COMMANDS=(
-	"dev:turbo|🚀 Start the full-stack turbo server|bun dev"
-	"dev:client|💻 Start the client dev server only|bun dev --filter=client"
-	"dev:server|⚙️ Start the server dev server only|bun dev --filter=server"
-	"db:studio|🗃️ Open Prisma Studio in the browser|cd ./packages/db && bun db:studio"
-	"db:pull|🔽 Pull schema from the remote database|cd ./packages/db && bun db:pull"
-	"db:generate|⚡ Generate the Prisma client|cd ./packages/db && bun db:generate"
-	"db:push|🔼 Push schema changes to the database|cd ./packages/db && bun db:push"
-	"db:drop|🔥 Drop the database (irreversible)|cd ./packages/db && bun db:drop"
-	"worker:start:git|👷 Start the Git Extract Worker|cd ./apps/server && bun worker:git"
-	"worker:start:container|📦 Start the Container Worker|cd ./apps/server && bun worker:container"
-	"worker:start:file-sync|🔄 Start the File Sync Worker|cd ./apps/server && bun worker:file-sync"
-	"worker:clear:extract|🧹 Clear the 'extract' queue|cd ./apps/server && bun clear:queue extract"
-	"worker:clear:container|🧹 Clear the 'container' queue|cd ./apps/server && bun clear:queue container"
-	"worker:clear:file-sync|🧹 Clear the 'file-sync' queue|cd ./apps/server && bun clear:queue file-sync"
+	"dev:turbo|🚀 Starting the full-stack turbo server -- (development)|doppler run -- bun dev"
+	"dev:client|💻 Starting NextJs Client -- (development)|doppler run -- bun dev --filter=client"
+	"dev:server|⚙️ Starting the HonoJs Server -- (development)|doppler run -- bun dev --filter=server"
+	"db:studio|🗃️ Opening Prisma Studio in the browser|cd ./packages/db && doppler run -- bun db:studio"
+	"db:pull|🔽 Pulling schema from the remote database|cd ./packages/db && doppler run -- bun db:pull"
+	"db:generate|⚡ Generating the Prisma client|cd ./packages/db && doppler run -- bun db:generate"
+	"db:push|🔼 Pushing schema changes to the database|cd ./packages/db && doppler run -- bun db:push"
+	"db:drop|🔥 Dropping the database (irreversible)|cd ./packages/db && doppler run -- bun db:drop"
+	"worker:start:git|👷 Starting the Git Extract Worker|cd ./apps/server && doppler run -- bun worker:git"
+	"worker:start:container|📦 Starting the Container Worker|cd ./apps/server && doppler run -- bun worker:container"
+	"worker:start:file-sync|🔄 Starting the File Sync Worker|cd ./apps/server && doppler run -- bun worker:file-sync"
+	"worker:clear:extract|🧹 Clearing the 'extract' queue|cd ./apps/server && doppler run -- bun clear:queue extract"
+	"worker:clear:container|🧹 Clearing the 'container' queue|cd ./apps/server && doppler run -- bun clear:queue container"
+	"worker:clear:file-sync|🧹 Clearing the 'file-sync' queue|cd ./apps/server && doppler run -- bun clear:queue file-sync"
 )
 
 # --- CORE FUNCTIONS ---
 
-# A more visually appealing command runner.
+# A smarter command runner: auto-detect long-running commands and stream logs directly.
 run_command() {
 	local title="$1" cmd="$2"
+
 	gum style --padding "0 1" --border normal --border-foreground 57 "$title"
-	if gum spin --spinner="moon" --title="Executing..." --show-output -- $SHELL -c "$cmd"; then
+
+	# Detect long-running/dev commands — skip spinner for these
+	if [[ "$cmd" == *"bun dev"* || "$cmd" == *"worker"* || "$cmd" == *"studio"* ]]; then
+		echo
+		gum style --faint "📡 Streaming logs (live mode)..."
+		echo "──────────────────────────────────────────────"
+		# Directly stream logs with colors preserved
+		eval "$cmd"
+		status=$?
+	else
+		# For short commands, keep spinner for clean UX
+		if gum spin --spinner="moon" --title="Executing..." --show-output -- $SHELL -c "$cmd"; then
+			status=0
+		else
+			status=1
+		fi
+	fi
+
+	echo "──────────────────────────────────────────────"
+
+	if [[ $status -eq 0 ]]; then
 		gum style --border rounded --border-foreground 40 --padding "0 1" "✔ Success"
 	else
 		gum style --border rounded --border-foreground 196 --padding "0 1" "✖ Command Failed"
@@ -41,11 +58,9 @@ run_command() {
 	fi
 }
 
-# Automatically generates a help table from the COMMANDS array.
+# Automatically generates a help table
 display_help() {
-	header="$(gum style --bold 'COMMAND')"
-	header="$header,$(gum style --bold 'SUBCOMMAND')"
-	header="$header,$(gum style --bold 'DESCRIPTION')"
+	header="$(gum style --bold 'COMMAND'),$(gum style --bold 'SUBCOMMAND'),$(gum style --bold 'DESCRIPTION')"
 
 	(
 		echo "$header"
@@ -58,9 +73,7 @@ display_help() {
 	) | gum table --separator "," --columns "COMMAND","SUBCOMMAND","DESCRIPTION" --widths 10,20,0
 }
 
-# --- SCRIPT MODES ---
-
-# Interactive mode, auto-generated from the COMMANDS array.
+# Interactive menu
 interactive_mode() {
 	local choices=()
 	for cmd_data in "${COMMANDS[@]}"; do
@@ -73,9 +86,7 @@ interactive_mode() {
 	main "${CHOICE%%:*}" "${CHOICE#*:}"
 }
 
-# Main execution logic. Now a compact, data-driven dispatcher.
 main() {
-	# Change to project root if necessary.
 	if [[ "$(pwd)" != "$PROJECT_ROOT" ]]; then
 		cd "$PROJECT_ROOT"
 		gum log --level info --structured "Switched to project root"
@@ -90,7 +101,6 @@ main() {
 			desc="${desc_and_exec%|*}"
 			exec_cmd="${desc_and_exec##*|}"
 
-			# Handle special cases that require confirmation.
 			case "$target_cmd" in
 			db:drop | worker:clear:*)
 				prompt_text="$(gum style --bold --foreground 214 "$desc?")"
@@ -115,9 +125,6 @@ main() {
 	fi
 }
 
-# --- ENTRYPOINT & EXIT HANDLING ---
-
-# Gracefully return to the original directory on script exit.
 cleanup() {
 	if [[ "$(pwd)" != "$ORIGINAL_DIR" ]]; then
 		cd "$ORIGINAL_DIR"
@@ -125,13 +132,13 @@ cleanup() {
 }
 trap cleanup EXIT
 
-# Display a modern banner.
+# Banner
 gum join --vertical --align center \
 	"$(gum style --border double --padding '0 2' --border-foreground 57 '🚀 AI Pair Programmer CLI')" \
 	"$(gum style --faint "$(date)")"
 echo
 
-# Route to the correct mode based on arguments.
+# Entry
 case "$1" in
 "" | -i | --interactive)
 	interactive_mode
