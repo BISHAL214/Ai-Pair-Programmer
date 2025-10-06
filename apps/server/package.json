@@ -1,5 +1,8 @@
 {
   "name": "server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "commonjs",
   "scripts": {
     "build": "tsc",
     "lint": "eslint . --ext .ts",

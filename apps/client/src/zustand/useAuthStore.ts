@@ -3,7 +3,7 @@
 
 import { queryClient } from "@/lib/query-client";
 import { supabase } from "@/lib/utils";
-import { useQueryClient } from "@tanstack/react-query";
+import { AuthChangeEvent, Session } from "@supabase/supabase-js";
 import { create } from "zustand";
 
 // The store is primarily to ensure the onAuthStateChange listener is set up only once.
@@ -20,12 +20,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return;
     }
 
-    supabase.auth.onAuthStateChange((event, session) => {
-      // Invalidate the session query whenever the auth state changes
-      console.log(`Supabase auth event: ${event}`);
-      console.log("New session:", session);
-      queryClient.setQueryData(["session"], session);
-    });
+    supabase.auth.onAuthStateChange(
+      (event: AuthChangeEvent, session: Session) => {
+        // Invalidate the session query whenever the auth state changes
+        console.log(`Supabase auth event: ${event}`);
+        console.log("New session:", session);
+        queryClient.setQueryData(["session"], session);
+      }
+    );
 
     set({ isListenerInitialized: true });
   },

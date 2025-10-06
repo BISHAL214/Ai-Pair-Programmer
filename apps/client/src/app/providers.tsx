@@ -1,11 +1,10 @@
 "use client";
 
-import { AuthProvider } from "@/lib/auth";
+import { useInitializeAuthListener } from "@/hooks/use-auth";
 import ReactQueryClientProviders from "@/lib/query-client";
 import { ThemeProvider } from "next-themes";
 import React from "react";
 import { Toaster } from "react-hot-toast";
-import { useInitializeAuthListener } from "@/hooks/use-auth";
 
 const Providers = ({ children }: { children: React.ReactNode }) => {
   useInitializeAuthListener();

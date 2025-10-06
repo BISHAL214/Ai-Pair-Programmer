@@ -6,9 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabaseAnonKey, supabaseUrl } from "@/constants";
 import { loginSchema, signupSchema } from "@/schemas/auth.schema";
-import { authMutaions } from "@/tanstack/mutations/auth.mutations";
 import { AuthMode, CurrentFormValues, Provider } from "@/types/auth.types";
-import { createSupabaseBrowserClient } from "@ai_pair_programmer/supabse-client";
+import { supabase } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IconBrandGithub, IconBrandGoogle } from "@tabler/icons-react";
 import { motion } from "framer-motion";
@@ -17,6 +16,10 @@ import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import {
+  useAuthFormMutation,
+  useAuthProviderMutation,
+} from "@/tanstack/mutations/auth.mutations";
 
 type AuthFormProps = {
   mode: AuthMode;
@@ -29,12 +32,6 @@ export const AuthForm = ({
   showOAuth = true,
   setMode,
 }: AuthFormProps) => {
-  const [supabase] = useState(() =>
-    createSupabaseBrowserClient(
-      supabaseUrl as string,
-      supabaseAnonKey as string,
-    ),
-  );
   const [activeProvider, setActiveProvider] = useState<Provider | null>(null);
 
   const router = useRouter();
@@ -57,13 +54,13 @@ export const AuthForm = ({
     mutate: handleAuthAction,
     isPending: isAuthActionLoading,
     error: authActionError,
-  } = authMutaions.authFormMutation({ router, mode });
+  } = useAuthFormMutation({ router });
 
   const {
     mutate: signInWithProvider,
     isPending: isProviderLoading,
     error: providerError,
-  } = authMutaions.authProviderMutation({
+  } = useAuthProviderMutation({
     setActiveProvider,
   });
 
@@ -72,7 +69,7 @@ export const AuthForm = ({
     // 1. Set local state to show loader immediately
     setActiveProvider(provider);
     // 2. Call mutation to handle the actual API call
-    signInWithProvider(provider);
+    signInWithProvider({ provider });
   };
 
   const isFormLoading = isAuthActionLoading || isProviderLoading;

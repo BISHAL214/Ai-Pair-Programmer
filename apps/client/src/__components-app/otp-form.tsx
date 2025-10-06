@@ -15,10 +15,10 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { authMutaions } from "@/tanstack/mutations/auth.mutations";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
+import { useAuthVerifyOTPMutation } from "@/tanstack/mutations/auth.mutations";
 
 interface OTPFormProps extends React.ComponentProps<"div"> {
   email?: string;
@@ -33,7 +33,13 @@ export function OTPForm({ className, email, ...props }: OTPFormProps) {
     isSuccess: isVerified,
     isError: isVerifyError,
     error: verifyError,
-  } = authMutaions.authVerifyOTPMutation({ router });
+  } = useAuthVerifyOTPMutation({ router });
+
+  useEffect(() => {
+    if (isVerified && !isVerifying && !isVerifyError) {
+      toast.success("Email verified successfully!", { duration: 1500 });
+    }
+  }, [isVerified, isVerifying, isVerifyError]);
 
   if (email === undefined) {
     toast.error("Email is required to verify OTP", { duration: 2000 });
@@ -41,12 +47,6 @@ export function OTPForm({ className, email, ...props }: OTPFormProps) {
   }
 
   const handleVerify = () => verifyOTP({ email, token: otp });
-
-  useEffect(() => {
-    if (isVerified && !isVerifying && !isVerifyError) {
-      toast.success("Email verified successfully!", { duration: 1500 });
-    }
-  }, [isVerified, isVerifying, isVerifyError]);
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>

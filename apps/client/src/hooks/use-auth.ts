@@ -1,4 +1,4 @@
-import { authQueries } from "@/tanstack/queries/auth.queries";
+import { useUserSessionQuery } from "@/tanstack/queries/auth.queries";
 import { useAuthStore } from "@/zustand/useAuthStore";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { useEffect } from "react";
@@ -10,7 +10,7 @@ export const useAuth = (supabase: SupabaseClient) => {
     isLoading,
     isError,
     error,
-  } = authQueries.userSessionQuery({ supabase });
+  } = useUserSessionQuery({ supabase });
   const user = session?.user ?? null;
 
   return {

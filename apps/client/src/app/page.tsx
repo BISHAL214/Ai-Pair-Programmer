@@ -1,27 +1,23 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { AnimatedAIChat } from "@/__components-app/ai-chatInput";
-import PixelBlast from "@/__components-app/pixel-blast";
-import { TextShimmer } from "@/__components-app/text-shimmer";
 import { NavigationBar } from "@/components/asternity/navbar";
 import { useAuth } from "@/hooks/use-auth";
-// import { useAuth } from "@/lib/auth";
 import {
   extractGithubFiles,
   fetchGitHubBranches,
   fetchGitHubRepos,
 } from "@/lib/github";
-import { handleZipUpload } from "@/lib/upload-zip";
 import { supabase } from "@/lib/utils";
-import { authMutaions } from "@/tanstack/mutations/auth.mutations";
+import { useAuthLogoutMutation } from "@/tanstack/mutations/auth.mutations";
 import { INFO, useProjectStore } from "@/zustand/useProjectStore";
-import { useQuery } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 
 export default function Page() {
   const router = useRouter();
-  const { user, isLoading, session, isAuthenticated } = useAuth(supabase);
+  const { user, session } = useAuth(supabase);
   const githubToken = session?.provider_token ?? null;
   const isGitHubConnected = !!githubToken;
 
@@ -32,10 +28,10 @@ export default function Page() {
     "github" | "zip" | ""
   >("");
   const [zipUploadFormData, setZipUploadFormData] = useState<FormData | null>(
-    null,
+    null
   );
 
-  const { setProjectUserId, setInfo, info, projectId } = useProjectStore();
+  const { setProjectUserId, setInfo } = useProjectStore();
   //   useProjectSocket();
 
   console.log(user);
@@ -44,7 +40,7 @@ export default function Page() {
     mutate: logout,
     //  isPending: isLogoutLoading,
     //  error: logoutError,
-  } = authMutaions.authLogoutMutation({ router });
+  } = useAuthLogoutMutation({ router });
   const handleLogout = () => {
     logout();
   };
@@ -52,7 +48,10 @@ export default function Page() {
   // ✅ GitHub repos
   const { data: repos = [] } = useQuery({
     queryKey: ["githubRepos"],
-    queryFn: () => fetchGitHubRepos(githubToken!),
+    queryFn: () => {
+      if (!githubToken) throw new Error("GitHub token is missing");
+      return fetchGitHubRepos(githubToken);
+    },
     enabled: !!githubToken,
     staleTime: 1000 * 60 * 5,
   });
@@ -60,12 +59,15 @@ export default function Page() {
   // ✅ GitHub branches
   const { data: branches = [] } = useQuery({
     queryKey: ["githubBranches", selectedRepo?.full_name],
-    queryFn: () =>
-      fetchGitHubBranches(
-        githubToken!,
-        selectedRepo?.owner?.login,
-        selectedRepo?.name,
-      ),
+    queryFn: () => {
+      if (!githubToken || !selectedRepo)
+        throw new Error("Missing GitHub token or selected repo");
+      return fetchGitHubBranches(
+        githubToken,
+        selectedRepo.owner?.login,
+        selectedRepo.name
+      );
+    },
     enabled: !!githubToken && !!selectedRepo,
     staleTime: 1000 * 60 * 5,
   });
@@ -77,14 +79,23 @@ export default function Page() {
     userId: string | null;
   }>({
     queryKey: ["githubExtractJob", selectedRepo?.name, selectedBranches],
-    queryFn: () =>
-      extractGithubFiles(
-        selectedRepo?.clone_url,
-        selectedRepo?.name,
-        user?.id as string,
+    queryFn: () => {
+      if (
+        !selectedRepo?.clone_url ||
+        !selectedRepo?.name ||
+        !user?.id ||
+        !githubToken
+      ) {
+        throw new Error("Missing required data for extraction job");
+      }
+      return extractGithubFiles(
+        selectedRepo.clone_url,
+        selectedRepo.name,
+        user.id,
         selectedBranches,
-        githubToken!,
-      ),
+        githubToken
+      );
+    },
     enabled: isTheChatStarted && projectSourceType === "github",
     staleTime: 1000 * 60 * 5,
   });
@@ -94,7 +105,7 @@ export default function Page() {
     if (extractJob) {
       setProjectUserId(
         extractJob.userId as string,
-        extractJob.projectId as string,
+        extractJob.projectId as string
       );
       setInfo("extraction", extractJob.jobInfo as INFO["extraction"]);
     }
@@ -107,27 +118,27 @@ export default function Page() {
     });
   };
 
-  const toggleBranch = (branch: string) =>
-    setSelectedBranches((prev) =>
-      prev.includes(branch)
-        ? prev.filter((b) => b !== branch)
-        : [...prev, branch],
-    );
+  //   const toggleBranch = (branch: string) =>
+  //     setSelectedBranches((prev) =>
+  //       prev.includes(branch)
+  //         ? prev.filter((b) => b !== branch)
+  //         : [...prev, branch]
+  //     );
 
-  const handleChatStarted = async () => {
-    if (selectedRepo && selectedBranches.length > 0) {
-      setProjectSourceType("github");
-    } else {
-      if (!zipUploadFormData) {
-        alert("Please upload a zip file");
-        return;
-      }
-      setProjectSourceType("zip");
-      await handleZipUpload(zipUploadFormData);
-      setZipUploadFormData(null);
-    }
-    setIsTheChatStarted(true);
-  };
+  //   const handleChatStarted = async () => {
+  //     if (selectedRepo && selectedBranches.length > 0) {
+  //       setProjectSourceType("github");
+  //     } else {
+  //       if (!zipUploadFormData) {
+  //         alert("Please upload a zip file");
+  //         return;
+  //       }
+  //       setProjectSourceType("zip");
+  //       await handleZipUpload(zipUploadFormData);
+  //       setZipUploadFormData(null);
+  //     }
+  //     setIsTheChatStarted(true);
+  //   };
 
   const handleZipInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -136,12 +147,21 @@ export default function Page() {
       (file.type !== "application/zip" &&
         file.type !== "application/x-zip-compressed")
     ) {
-      alert("Please upload a valid zip file");
+      // Using a custom modal or toast instead of alert is recommended
+      console.error("Please upload a valid zip file");
       return;
     }
+
+    // ✅ FIX: Check for user.id before using it.
+    if (!user?.id) {
+      console.error("User is not authenticated.");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("zip", file);
-    formData.append("userId", user?.id!);
+    // Now it's safe to use user.id without optional chaining or non-null assertion
+    formData.append("userId", user.id);
     formData.append("projectName", file.name.replace(".zip", ""));
     setZipUploadFormData(formData);
   };
@@ -197,196 +217,196 @@ export default function Page() {
   /* <main className="flex flex-1 justify-center items-center p-6 bg-gray-800"> */
 }
 {
-  /*   <Card className="w-full max-w-2xl p-4 shadow-lg border rounded-2xl z-10"> */
+  /* <Card className="w-full max-w-2xl p-4 shadow-lg border rounded-2xl z-10"> */
 }
 {
-  /*     <CardContent className="flex flex-col gap-4"> */
+  /* <CardContent className="flex flex-col gap-4"> */
 }
 {
-  /*       <Textarea */
+  /* <Textarea */
 }
 {
-  /*         placeholder="Type your message here..." */
+  /* placeholder="Type your message here..." */
 }
 {
-  /*         className="h-32" */
+  /* className="h-32" */
 }
 {
-  /*       /> */
+  /* /> */
 }
 {
-  /*       <div className="flex gap-4"> */
+  /* <div className="flex gap-4"> */
 }
 {
-  /*         <Button onClick={handleChatStarted}>Send</Button> */
+  /* <Button onClick={handleChatStarted}>Send</Button> */
 }
 {
-  /*         <Input */
+  /* <Input */
 }
 {
-  /*           onChange={handleZipInputChange} */
+  /* onChange={handleZipInputChange} */
 }
 {
-  /*           type="file" */
+  /* type="file" */
 }
 {
-  /*           accept=".zip" */
+  /* accept=".zip" */
 }
 {
-  /*           className="cursor-pointer" */
+  /* className="cursor-pointer" */
 }
 {
-  /*         /> */
+  /* /> */
 }
 {
-  /*       </div> */
-}
-{
-  /**/
-}
-{
-  /*       {!isGitHubConnected ? ( */
-}
-{
-  /*         <Button onClick={handleConnectGitHub}>Connect GitHub</Button> */
-}
-{
-  /*       ) : ( */
-}
-{
-  /*         <> */
-}
-{
-  /*           <Label className="mt-4">Select GitHub Repo</Label> */
-}
-{
-  /*           <select */
-}
-{
-  /*             onChange={(e) => setSelectedRepo(JSON.parse(e.target.value))} */
-}
-{
-  /*             className="border p-2 rounded" */
-}
-{
-  /*             value={selectedRepo ? JSON.stringify(selectedRepo) : ""} */
-}
-{
-  /*           > */
-}
-{
-  /*             <option value="">Select a repo...</option> */
-}
-{
-  /*             {repos.map((repo: any) => ( */
-}
-{
-  /*               <option */
-}
-{
-  /*                 className="bg-gray-700" */
-}
-{
-  /*                 key={repo.id} */
-}
-{
-  /*                 value={JSON.stringify(repo)} */
-}
-{
-  /*               > */
-}
-{
-  /*                 {repo.name} */
-}
-{
-  /*               </option> */
-}
-{
-  /*             ))} */
-}
-{
-  /*           </select> */
+  /* </div> */
 }
 {
   /**/
 }
 {
-  /*           {branches.length > 0 && ( */
+  /* {!isGitHubConnected ? ( */
 }
 {
-  /*             <> */
+  /* <Button onClick={handleConnectGitHub}>Connect GitHub</Button> */
 }
 {
-  /*               <Label className="mt-4">Select Branches</Label> */
+  /* ) : ( */
 }
 {
-  /*               <div className="flex flex-col gap-1"> */
+  /* <> */
 }
 {
-  /*                 {branches.map((branch: any) => ( */
+  /* <Label className="mt-4">Select GitHub Repo</Label> */
 }
 {
-  /*                   <label */
+  /* <select */
 }
 {
-  /*                     key={branch.name} */
+  /* onChange={(e) => setSelectedRepo(JSON.parse(e.target.value))} */
 }
 {
-  /*                     className="flex items-center gap-2" */
+  /* className="border p-2 rounded" */
 }
 {
-  /*                   > */
+  /* value={selectedRepo ? JSON.stringify(selectedRepo) : ""} */
 }
 {
-  /*                     <Checkbox */
+  /* > */
 }
 {
-  /*                       checked={selectedBranches.includes(branch.name)} */
+  /* <option value="">Select a repo...</option> */
 }
 {
-  /*                       onCheckedChange={() => toggleBranch(branch.name)} */
+  /* {repos.map((repo: any) => ( */
 }
 {
-  /*                     /> */
+  /* <option */
 }
 {
-  /*                     {branch.name} */
+  /* className="bg-gray-700" */
 }
 {
-  /*                   </label> */
+  /* key={repo.id} */
 }
 {
-  /*                 ))} */
+  /* value={JSON.stringify(repo)} */
 }
 {
-  /*               </div> */
+  /* > */
 }
 {
-  /*             </> */
+  /* {repo.name} */
 }
 {
-  /*           )} */
+  /* </option> */
 }
 {
-  /*         </> */
+  /* ))} */
 }
 {
-  /*       )} */
+  /* </select> */
 }
 {
-  /*     </CardContent> */
+  /**/
 }
 {
-  /*   </Card> */
+  /* {branches.length > 0 && ( */
 }
 {
-  /*   {isTheChatStarted && ( */
+  /* <> */
 }
 {
-  /*     <MultiStageLoaderComplete setIsTheChatStarted={setIsTheChatStarted} /> */
+  /* <Label className="mt-4">Select Branches</Label> */
 }
 {
-  /*   )} */
+  /* <div className="flex flex-col gap-1"> */
+}
+{
+  /* {branches.map((branch: any) => ( */
+}
+{
+  /* <label */
+}
+{
+  /* key={branch.name} */
+}
+{
+  /* className="flex items-center gap-2" */
+}
+{
+  /* > */
+}
+{
+  /* <Checkbox */
+}
+{
+  /* checked={selectedBranches.includes(branch.name)} */
+}
+{
+  /* onCheckedChange={() => toggleBranch(branch.name)} */
+}
+{
+  /* /> */
+}
+{
+  /* {branch.name} */
+}
+{
+  /* </label> */
+}
+{
+  /* ))} */
+}
+{
+  /* </div> */
+}
+{
+  /* </> */
+}
+{
+  /* )} */
+}
+{
+  /* </> */
+}
+{
+  /* )} */
+}
+{
+  /* </CardContent> */
+}
+{
+  /* </Card> */
+}
+{
+  /* {isTheChatStarted && ( */
+}
+{
+  /* <MultiStageLoaderComplete setIsTheChatStarted={setIsTheChatStarted} /> */
+}
+{
+  /* )} */
 }
 {
   /* </main> */

@@ -5,7 +5,7 @@ import PixelBlast from "@/__components-app/pixel-blast";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-const page = () => {
+const AuthPage = () => {
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
   const router = useRouter();
   return (
@@ -36,4 +36,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default AuthPage;
