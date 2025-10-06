@@ -1,167 +1,145 @@
 #!/usr/bin/env bash
 set -e
 
-# usage: ./run.sh <directory>
-# example: ./run.sh apps/server
+# --- SCRIPT CONFIGURATION & DATA ---
 
-# if [ -z "$DIR" ]; then
-#   gum style --foreground 196 "❌ Usage: $0 <directory>"
-#   gum style --foreground 244 "   Example: ./run.sh apps/client"
-#   exit 1
-# fi
+# Dynamically determine the project's root directory.
+PROJECT_ROOT=$(cd "$(dirname "$0")" && pwd)
+ORIGINAL_DIR=$(pwd)
 
-# Banner
-gum style --border double --margin "1 2" --padding "1 2" \
-  --foreground 33 "📂 Running command in Ai Powered Pair Programmer"
+# SINGLE SOURCE OF TRUTH for all commands.
+# Format: "command:subcommand|Description|Shell command to execute"
+# To add a new command, just add a new line here. Everything else updates automatically.
+IFS=$'\n' COMMANDS=(
+	"dev:turbo|🚀 Start the full-stack turbo server|bun dev"
+	"dev:client|💻 Start the client dev server only|bun dev --filter=client"
+	"dev:server|⚙️ Start the server dev server only|bun dev --filter=server"
+	"db:studio|🗃️ Open Prisma Studio in the browser|cd ./packages/db && bun db:studio"
+	"db:pull|🔽 Pull schema from the remote database|cd ./packages/db && bun db:pull"
+	"db:generate|⚡ Generate the Prisma client|cd ./packages/db && bun db:generate"
+	"db:push|🔼 Push schema changes to the database|cd ./packages/db && bun db:push"
+	"db:drop|🔥 Drop the database (irreversible)|cd ./packages/db && bun db:drop"
+	"worker:start:git|👷 Start the Git Extract Worker|cd ./apps/server && bun worker:git"
+	"worker:start:container|📦 Start the Container Worker|cd ./apps/server && bun worker:container"
+	"worker:start:file-sync|🔄 Start the File Sync Worker|cd ./apps/server && bun worker:file-sync"
+	"worker:clear:extract|🧹 Clear the 'extract' queue|cd ./apps/server && bun clear:queue extract"
+	"worker:clear:container|🧹 Clear the 'container' queue|cd ./apps/server && bun clear:queue container"
+	"worker:clear:file-sync|🧹 Clear the 'file-sync' queue|cd ./apps/server && bun clear:queue file-sync"
+)
 
-# Main command selection
-COMMAND=$(gum choose "dev" "db" "worker" "exit")
+# --- CORE FUNCTIONS ---
 
-if [ "$COMMAND" = "exit" ]; then
-  gum style --foreground 244 "👋 Exiting..."
-  exit 0
-fi
+# A more visually appealing command runner.
+run_command() {
+	local title="$1" cmd="$2"
+	gum style --padding "0 1" --border normal --border-foreground 57 "$title"
+	if gum spin --spinner="moon" --title="Executing..." --show-output -- $SHELL -c "$cmd"; then
+		gum style --border rounded --border-foreground 40 --padding "0 1" "✔ Success"
+	else
+		gum style --border rounded --border-foreground 196 --padding "0 1" "✖ Command Failed"
+		exit 1
+	fi
+}
 
-case "$COMMAND" in
-  dev)
-    DEVCOMMAND=$(gum choose "turbo_dev" "client_dev" "server_dev" "exit")
+# Automatically generates a help table from the COMMANDS array.
+display_help() {
+	header="$(gum style --bold 'COMMAND')"
+	header="$header,$(gum style --bold 'SUBCOMMAND')"
+	header="$header,$(gum style --bold 'DESCRIPTION')"
 
-    if [ "$DEVCOMMAND" = "exit" ]; then
-      gum style --foreground 244 "👋 Exiting..."
-      exit 0
-    fi
+	(
+		echo "$header"
+		for cmd_data in "${COMMANDS[@]}"; do
+			IFS=':' read -r cmd sub <<<"${cmd_data%%|*}"
+			desc="${cmd_data#*|}"
+			desc="${desc%|*}"
+			printf "%s,%s,%s\n" "$cmd" "$sub" "$desc"
+		done
+	) | gum table --separator "," --columns "COMMAND","SUBCOMMAND","DESCRIPTION" --widths 10,20,0
+}
 
-    case "$DEVCOMMAND" in
-      turbo_dev)
-        gum style --foreground 84 "▶ Starting turbo development server..."
-        bun dev
-        ;;
-      client_dev)
-        gum style --foreground 82 "▶ Starting client development server..."
-        bun dev --filter=client
-        ;;
-      server_dev)
-        gum style --foreground 75 "▶ Starting server development server..."
-        bun dev --filter=server
-        ;;
-      *)
-        gum style --foreground 196 "❌ Unknown dev command: $DEVCOMMAND"
-        exit 1
-        ;;
-    esac
-    ;;
+# --- SCRIPT MODES ---
 
-  db)
-    DBCOMMAND=$(gum choose "db_studio" "db_pull" "db_generate" "db_drop" "db_check" "db_up" "db_push" "exit")
+# Interactive mode, auto-generated from the COMMANDS array.
+interactive_mode() {
+	local choices=()
+	for cmd_data in "${COMMANDS[@]}"; do
+		choices+=("${cmd_data%%|*}")
+	done
 
-    if [ "$DBCOMMAND" = "exit" ]; then
-      gum style --foreground 244 "👋 Exiting..."
-      exit 0
-    fi
+	CHOICE=$(gum filter "${choices[@]}" --header="Choose a command to run..." --height=15)
+	[[ -z "$CHOICE" ]] && exit 0
 
-    DBDIR=./packages/db
+	main "${CHOICE%%:*}" "${CHOICE#*:}"
+}
 
-    case "$DBCOMMAND" in
-      db_pull)
-        gum style --foreground 84 "🥄 Pulling from database..."
-        cd $DBDIR && bun db:pull
-        ;;
-      db_studio)
-        gum style --foreground 30 "🎙️ Starting database studio..."
-        cd $DBDIR && bun db:studio
-        ;;
-      db_generate)
-        gum style --foreground 90 "⚡ Starting database generation..."
-        cd $DBDIR && bun db:generate
-        ;;
-      db_drop)
-        gum style --foreground 120 "❌ Dropping database..."
-        cd $DBDIR && bun db:drop
-        ;;
-      *)
-        gum style --foreground 196 "❌ Unknown db command: $DBCOMMAND"
-        exit 1
-        ;;
-    esac
-    ;;
+# Main execution logic. Now a compact, data-driven dispatcher.
+main() {
+	# Change to project root if necessary.
+	if [[ "$(pwd)" != "$PROJECT_ROOT" ]]; then
+		cd "$PROJECT_ROOT"
+		gum log --level info --structured "Switched to project root"
+	fi
 
-  worker)
-    WORKERCOMMAND=$(gum choose "start_worker" "clear_queue" "exit")
+	local target_cmd="$1:$2" command_found=false
 
-    if [ "$WORKERCOMMAND" = "exit" ]; then
-      gum style --foreground 244 "👋 Exiting..."
-      exit 0
-    fi
+	for cmd_data in "${COMMANDS[@]}"; do
+		if [[ "${cmd_data%%|*}" == "$target_cmd" ]]; then
+			command_found=true
+			desc_and_exec="${cmd_data#*|}"
+			desc="${desc_and_exec%|*}"
+			exec_cmd="${desc_and_exec##*|}"
 
-    WORKERDIR=./apps/server
+			# Handle special cases that require confirmation.
+			case "$target_cmd" in
+			db:drop | worker:clear:*)
+				prompt_text="$(gum style --bold --foreground 214 "$desc?")"
+				if gum confirm "$prompt_text"; then
+					run_command "$desc" "$exec_cmd"
+				else
+					gum style --faint "Action cancelled."
+				fi
+				;;
+			*)
+				run_command "$desc" "$exec_cmd"
+				;;
+			esac
+			break
+		fi
+	done
 
-    case "$WORKERCOMMAND" in
-      start_worker)
-        gum style --foreground 207 "💼 Select which worker to start..."
-        WORKERSTARTCOMMAND=$(gum choose "git_worker" "container_worker" "file_sync_worker" "exit")
+	if ! $command_found; then
+		gum log --level error "Unknown command: $1 $2"
+		display_help
+		exit 1
+	fi
+}
 
-        if [ "$WORKERSTARTCOMMAND" = "exit" ]; then
-          gum style --foreground 244 "👋 Exiting..."
-          exit 0
-        fi
+# --- ENTRYPOINT & EXIT HANDLING ---
 
-        case "$WORKERSTARTCOMMAND" in
-          git_worker)
-            gum style --foreground 75 "▶ Starting Git Extract Worker..."
-            cd $WORKERDIR && bun worker:git
-            ;;
-          container_worker)
-            gum style --foreground 75 "▶ Starting Container Extract Worker..."
-            cd $WORKERDIR && bun worker:container
-            ;;
-          file_sync_worker)
-            gum style --foreground 75 "▶ Starting File Sync Extract Worker..."
-            cd $WORKERDIR && bun worker:file-sync
-            ;;
-          *)
-            gum style --foreground 196 "❌ Unknown worker command: $WORKERSTARTCOMMAND"
-            exit 1
-            ;;
-        esac
-        ;;
+# Gracefully return to the original directory on script exit.
+cleanup() {
+	if [[ "$(pwd)" != "$ORIGINAL_DIR" ]]; then
+		cd "$ORIGINAL_DIR"
+	fi
+}
+trap cleanup EXIT
 
-      clear_queue)
-        gum style --foreground 196 "🚽 Select which queue to clear..."
-        CLEARCOMMAND=$(gum choose "extract_queue" "container_queue" "file_sync_queue" "exit")
+# Display a modern banner.
+gum join --vertical --align center \
+	"$(gum style --border double --padding '0 2' --border-foreground 57 '🚀 AI Pair Programmer CLI')" \
+	"$(gum style --faint "$(date)")"
+echo
 
-        if [ "$CLEARCOMMAND" = "exit" ]; then
-          gum style --foreground 244 "👋 Exiting..."
-          exit 0
-        fi
-
-        case "$CLEARCOMMAND" in
-          extract_queue)
-            gum style --foreground 214 "🧹 Clearing Extract Queue..."
-            cd $WORKERDIR && bun clear:queue extract
-            ;;
-          container_queue)
-            gum style --foreground 214 "🧹 Clearing Container Queue..."
-            cd $WORKERDIR && bun clear:queue container
-            ;;
-          file_sync_queue)
-            gum style --foreground 214 "🧹 Clearing File Sync Queue..."
-            cd $WORKERDIR && bun clear:queue file-sync
-            ;;
-          *)
-            gum style --foreground 196 "❌ Unknown clear command: $CLEARCOMMAND"
-            exit 1
-            ;;
-        esac
-        ;;
-      *)
-        gum style --foreground 196 "❌ Unknown worker command: $WORKERCOMMAND"
-        exit 1
-        ;;
-    esac
-    ;;
-
-  *)
-    gum style --foreground 196 "❌ Unknown command: $COMMAND"
-    exit 1
-    ;;
+# Route to the correct mode based on arguments.
+case "$1" in
+"" | -i | --interactive)
+	interactive_mode
+	;;
+help | -h | --help)
+	display_help
+	;;
+*)
+	main "$@"
+	;;
 esac
