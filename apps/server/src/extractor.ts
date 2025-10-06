@@ -1,7 +1,7 @@
 import * as dotenv from "dotenv";
 dotenv.config({ path: "../../.env" });
 
-import { db, schema } from "@repo/db";
+import { db, Schema } from "@repo/db";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { promises as fs } from "fs";
 import * as crypto from "node:crypto";
@@ -18,7 +18,7 @@ const supabase_service_role_key = process.env.SERVICE_ROLE_KEY!;
 
 export const createSupabaseServerClient: SupabaseClient = createClient(
   supabase_url,
-  supabase_service_role_key,
+  supabase_service_role_key
 );
 
 // --- Project detection helpers ---
@@ -69,7 +69,7 @@ export async function extractFilesFromGitAndUpload(
   userId: string,
   branches: string[],
   token: string,
-  projectId: string,
+  projectId: string
 ): Promise<void> {
   const jobId = crypto.randomUUID();
   const baseDir = path.join(os.tmpdir(), `git-job-${jobId}`);
@@ -111,7 +111,7 @@ export async function extractFilesFromGitAndUpload(
 
         // Store in Supabase DB
         await db
-          .insert(schema.files)
+          .insert(Schema.files)
           .values({
             path: relativePath,
             content: content,
@@ -125,7 +125,7 @@ export async function extractFilesFromGitAndUpload(
           .catch((error) => {
             console.error(
               `Failed to store file ${relativePath} in database:`,
-              error,
+              error
             );
           });
 
@@ -152,7 +152,7 @@ export async function extractFilesFromGitAndUpload(
         console.error(`❌ Failed to upload zip ${zipPath}:`, error);
       });
     console.log(
-      `Extraction and upload complete for project ${repoName} from github, branches: ${branches.join(", ")}`,
+      `Extraction and upload complete for project ${repoName} from github, branches: ${branches.join(", ")}`
     );
     console.log("Detected types:", Array.from(detectedTypes));
     console.log("Detected tools:", Array.from(detectedTools));
@@ -167,7 +167,7 @@ export async function extractFilesFromGitAndUpload(
         cpu: 1,
         memoryMB: 512,
       },
-      { attempts: 3, removeOnComplete: true },
+      { attempts: 3, removeOnComplete: true }
     );
 
     console.log("sending event to inngest");
@@ -195,7 +195,7 @@ export async function extractFileFromUploadedZip(
   zipPath: string,
   userId: string,
   projectName: string,
-  projectId: string,
+  projectId: string
 ) {
   const tmpDir = path.join(os.tmpdir(), `unzipped-${crypto.randomUUID()}`);
 
@@ -219,7 +219,7 @@ export async function extractFileFromUploadedZip(
           }
           await writeStream.close();
         }
-      }),
+      })
     );
 
     const files = await walkFiles(tmpDir, tmpDir);
@@ -246,7 +246,7 @@ export async function extractFileFromUploadedZip(
 
       // Store in Supabase DB
       try {
-        await db.insert(schema.files).values({
+        await db.insert(Schema.files).values({
           path: relativePath,
           content,
           projectId,
@@ -259,7 +259,7 @@ export async function extractFileFromUploadedZip(
     }
 
     console.log(
-      `Extraction and upload complete for project ${projectName} from zip`,
+      `Extraction and upload complete for project ${projectName} from zip`
     );
     console.log("sending event to inngest");
 
@@ -294,7 +294,7 @@ async function walkFiles(dir: string, baseDir: string): Promise<string[]> {
         return path.relative(baseDir, res);
       }
       return []; // Return an empty array for the .git folder or any other non-file entry
-    }),
+    })
   );
   return files.flat().filter(Boolean) as string[]; // filter out any empty entries
 }

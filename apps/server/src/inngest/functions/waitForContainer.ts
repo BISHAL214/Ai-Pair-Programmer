@@ -1,6 +1,6 @@
 import { inngest } from "@repo/inngest";
 
-export const waitForContainer = inngest.createFunction(
+export const waitForContainer: any = inngest.createFunction(
   { id: "wait-for-container" },
   { event: "project_extracted" },
   async ({ event, step }) => {
@@ -42,5 +42,5 @@ export const waitForContainer = inngest.createFunction(
         containerJobId: event.data.containerJobId,
       },
     });
-  },
+  }
 );

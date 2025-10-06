@@ -1,15 +1,14 @@
-import { Hono } from "hono";
-import { extractQueue } from "./queue";
-import { cors } from "hono/cors";
-import * as path from "node:path";
-import * as os from "node:os";
-import { promises as fs } from "node:fs";
-import { db, schema } from "@repo/db";
-import { serve } from "inngest/hono";
+import { db, Schema } from "@repo/db";
 import { inngest } from "@repo/inngest";
-import { waitForContainer } from "./inngest/functions/waitForContainer";
+import { Hono } from "hono";
+import { cors } from "hono/cors";
+import { serve } from "inngest/hono";
+import { promises as fs } from "node:fs";
+import * as os from "node:os";
+import * as path from "node:path";
 import { startFileSync } from "./inngest/functions/startFileSync";
-import { swaggerUI, SwaggerUI } from "@hono/swagger-ui";
+import { waitForContainer } from "./inngest/functions/waitForContainer";
+import { extractQueue } from "./queue";
 
 const app = new Hono();
 
@@ -19,7 +18,7 @@ app.use(
     origin: "http://localhost:3000", // Allow specific origin
     allowMethods: ["GET", "POST"], // Allow specific methods
     allowHeaders: ["Content-Type", "Authorization"], // Allow specific headers
-  }),
+  })
 );
 
 app.get("/", (c) => {
@@ -30,7 +29,7 @@ app.get("/", (c) => {
 app.on(
   ["GET", "PUT", "POST"],
   "/api/inngest",
-  serve({ client: inngest, functions: [waitForContainer, startFileSync] }),
+  serve({ client: inngest, functions: [waitForContainer, startFileSync] })
 );
 
 app.post("/api/github-extract", async (c) => {
@@ -40,14 +39,14 @@ app.post("/api/github-extract", async (c) => {
   const sourceType = "github";
 
   const newProject = await db
-    .insert(schema.projects)
+    .insert(Schema.projects)
     .values({
       name: repoName,
       userId: userId,
       sourceType: sourceType,
       githubUrl: repoUrl,
     })
-    .returning({ projectId: schema.projects.id });
+    .returning({ projectId: Schema.projects.id });
   const projectId = newProject[0].projectId;
 
   const job = await extractQueue.add(
@@ -61,7 +60,7 @@ app.post("/api/github-extract", async (c) => {
       sourceType,
       projectId,
     },
-    { attempts: 3, removeOnComplete: true },
+    { attempts: 3, removeOnComplete: true }
   );
 
   return c.json({
@@ -72,7 +71,9 @@ app.post("/api/github-extract", async (c) => {
 });
 
 // Helper function to convert a ReadableStream to a Buffer, replacing Bun's implementation
-async function readableStreamToBuffer(stream: ReadableStream<Uint8Array>): Promise<Buffer> {
+async function readableStreamToBuffer(
+  stream: ReadableStream<Uint8Array>
+): Promise<Buffer> {
   const reader = stream.getReader();
   const chunks: Uint8Array[] = [];
   while (true) {
@@ -96,13 +97,13 @@ app.post("/api/upload-zip", async (c) => {
   const sourceType = "zip";
 
   const newProject = await db
-    .insert(schema.projects)
+    .insert(Schema.projects)
     .values({
       name: projectName,
       userId: userId,
       sourceType: sourceType,
     })
-    .returning({ projectId: schema.projects.id });
+    .returning({ projectId: Schema.projects.id });
   const projectId = newProject[0].projectId;
 
   if (!zipFile || !userId || !projectName) {
@@ -123,7 +124,7 @@ app.post("/api/upload-zip", async (c) => {
       sourceType,
       projectId,
     },
-    { attempts: 3, removeOnComplete: true },
+    { attempts: 3, removeOnComplete: true }
   );
 
   return c.json({ jobId: job.id });

@@ -18,6 +18,9 @@
   "engines": {
     "node": ">=18"
   },
+  "overrides": {
+    "hono": "^4.9.10"
+  },
   "packageManager": "pnpm@9.6.0",
   "dependencies": {
     "eslint": "^9.37.0"

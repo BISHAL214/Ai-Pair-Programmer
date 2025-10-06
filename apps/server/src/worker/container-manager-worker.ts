@@ -1,8 +1,5 @@
-import {
-  ContainerConfig,
-  ContainerManager,
-} from "@repo/orchestrator";
-import { redis as connection } from "@repo/redis";
+import { ContainerConfig, ContainerManager } from "@repo/orchestrator";
+import { connection } from "@repo/redis";
 import { Worker } from "bullmq";
 import { io } from "socket.io-client";
 import { produceEvent } from "../inngest/utils/inngestEventProducer";
@@ -61,7 +58,7 @@ const worker = new Worker(
       containerInfo: info,
     };
   },
-  { connection, concurrency: 2 },
+  { connection, concurrency: 2 }
 );
 worker.on("completed", (job) => {
   console.log(`✅ Job ${job.id} completed`);

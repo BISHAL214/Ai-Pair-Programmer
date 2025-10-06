@@ -1,7 +1,7 @@
 import { inngest } from "@repo/inngest";
 import { syncReadyQueue } from "../../queue";
 
-export const startFileSync = inngest.createFunction(
+export const startFileSync: any = inngest.createFunction(
   { id: "start-file-sync" },
   { event: "sync_ready" },
   async ({ event, step }) => {
@@ -20,8 +20,8 @@ export const startFileSync = inngest.createFunction(
           tools: event.data.tools,
           monorepo: event.data.monorepo,
         },
-        { attempts: 5, removeOnComplete: true },
+        { attempts: 5, removeOnComplete: true }
       );
     });
-  },
+  }
 );

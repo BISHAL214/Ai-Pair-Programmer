@@ -1,5 +1,5 @@
 import { Queue } from "bullmq";
-import { redis as connection } from "@repo/redis";
+import { connection } from "@repo/redis";
 
 export const extractQueue = new Queue("extract-jobs", {
   connection,

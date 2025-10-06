@@ -41,7 +41,7 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     console.log("user disconnected", socket.id);
-    for (const [userId, sId] of userMap.entries()) {
+    for (const [userId, sId] of Array.from(userMap.entries())) {
       if (sId === socket.id) {
         userMap.delete(userId);
         console.log(`User unregistered: ${userId}`);
