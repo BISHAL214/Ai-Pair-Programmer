@@ -1,8 +1,8 @@
 import {
   ContainerConfig,
   ContainerManager,
-} from "@ai_pair_programmer/orchestrator";
-import { connection } from "@ai_pair_programmer/redis";
+} from "@repo/orchestrator";
+import { redis as connection } from "@repo/redis";
 import { Worker } from "bullmq";
 import { io } from "socket.io-client";
 import { produceEvent } from "../inngest/utils/inngestEventProducer";

@@ -1,5 +1,5 @@
 import { supabaseAnonKey, supabaseServiceKey, supabaseUrl } from "@/constants";
-import { createSupabaseBrowserClient } from "@ai_pair_programmer/supabse-client";
+import { supabase as supabase_client } from "@repo/supabase-client";
 import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
 import { clsx, type ClassValue } from "clsx";
@@ -9,10 +9,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export const supabase = createSupabaseBrowserClient(
-  supabaseUrl as string,
-  supabaseAnonKey as string,
-);
+export const supabase = supabase_client;
 
 export const supabase_service = createClient(
   supabaseUrl as string,

@@ -1,4 +1,4 @@
-import { inngest } from "@ai_pair_programmer/inngest";
+import { inngest } from "@repo/inngest";
 import { syncReadyQueue } from "../../queue";
 
 export const startFileSync = inngest.createFunction(

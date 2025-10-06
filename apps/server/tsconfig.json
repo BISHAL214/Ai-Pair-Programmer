@@ -1,17 +1,12 @@
 {
+  "extends": "@repo/typescript-config/base.json",
   "compilerOptions": {
-    "strict": true,
-    "jsx": "react-jsx",
-    "target": "es6",
-    "moduleResolution": "node",
-    "jsxImportSource": "hono/jsx",
-    "allowSyntheticDefaultImports": true,
+    "outDir": "dist",
+    "baseUrl": ".",
     "paths": {
-      "@ai_pair_programmer/db": ["../../packages/db"],
-      "@ai_pair_programmer/supabase-client": ["../../packages/supabase-client"],
-      "@ai_pair_programmer/redis": ["../../packages/redis"],
-      "@ai_pair_programmer/inngest": ["../../packages/inngest"],
-      "@ai_pair_programmer/orchestrator": ["../../packages/orchestrator"]
+      "@repo/*": ["../../packages/*"]
     }
-  }
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"]
 }

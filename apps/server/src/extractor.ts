@@ -1,7 +1,7 @@
 import * as dotenv from "dotenv";
 dotenv.config({ path: "../../.env" });
 
-import db, { schema } from "@ai_pair_programmer/db";
+import { db, schema } from "@repo/db";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { promises as fs } from "fs";
 import * as crypto from "node:crypto";

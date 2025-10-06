@@ -1,4 +1,4 @@
-import { connection } from "@ai_pair_programmer/redis";
+import { redis as connection } from "@repo/redis";
 import { Worker } from "bullmq";
 import { io } from "socket.io-client";
 import {

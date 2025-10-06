@@ -1,11 +1,11 @@
 // import * as dotenv from "dotenv";
 // dotenv.config({ path: "../../.env" });
 
-import { connection } from "@ai_pair_programmer/redis";
+import { redis as connection } from "@repo/redis";
 import { Worker } from "bullmq";
 import { io } from "socket.io-client";
 import Docker from "dockerode";
-import { ContainerManager } from "../../../../packages/orchestrator/containerManager";
+import { ContainerManager } from "@repo/orchestrator";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
 console.log("👷 File Sync Worker started and waiting for jobs...");

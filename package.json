@@ -18,11 +18,7 @@
   "engines": {
     "node": ">=18"
   },
-  "packageManager": "bun@1.2.21",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
+  "packageManager": "pnpm@9.6.0",
   "dependencies": {
     "eslint": "^9.37.0"
   }

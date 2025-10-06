@@ -1,8 +1,0 @@
-{
-  "compilerOptions": {
-    "strict": true,
-    "paths": {
-      "@ai_pair_programmer/kafka-consumer": ["../kafka-consumer"]
-    }
-  }
-}

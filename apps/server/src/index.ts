@@ -1,14 +1,12 @@
-require("dotenv-mono").load({ path: "../../.env" });
 import { Hono } from "hono";
 import { extractQueue } from "./queue";
 import { cors } from "hono/cors";
-import { readableStreamToArrayBuffer } from "bun";
 import * as path from "node:path";
 import * as os from "node:os";
 import { promises as fs } from "node:fs";
-import db, { schema } from "@ai_pair_programmer/db";
+import { db, schema } from "@repo/db";
 import { serve } from "inngest/hono";
-import { inngest } from "@ai_pair_programmer/inngest";
+import { inngest } from "@repo/inngest";
 import { waitForContainer } from "./inngest/functions/waitForContainer";
 import { startFileSync } from "./inngest/functions/startFileSync";
 import { swaggerUI, SwaggerUI } from "@hono/swagger-ui";
@@ -73,6 +71,22 @@ app.post("/api/github-extract", async (c) => {
   });
 });
 
+// Helper function to convert a ReadableStream to a Buffer, replacing Bun's implementation
+async function readableStreamToBuffer(stream: ReadableStream<Uint8Array>): Promise<Buffer> {
+  const reader = stream.getReader();
+  const chunks: Uint8Array[] = [];
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) {
+      break;
+    }
+    if (value) {
+      chunks.push(value);
+    }
+  }
+  return Buffer.concat(chunks);
+}
+
 app.post("/api/upload-zip", async (c) => {
   const formdata = await c.req.formData();
   console.log("from server", formdata);
@@ -96,9 +110,9 @@ app.post("/api/upload-zip", async (c) => {
   }
 
   const jobId = crypto.randomUUID();
-  const zipBuffer = await readableStreamToArrayBuffer(zipFile.stream());
+  const zipBuffer = await readableStreamToBuffer(zipFile.stream());
   const zipPath = path.join(os.tmpdir(), `upload-${jobId}.zip`);
-  await fs.writeFile(zipPath, Buffer.from(zipBuffer));
+  await fs.writeFile(zipPath, zipBuffer);
 
   const job = await extractQueue.add(
     "extract-zip",

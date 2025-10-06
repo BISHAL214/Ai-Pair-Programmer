@@ -1,4 +1,4 @@
-import { inngest } from "@ai_pair_programmer/inngest";
+import { inngest } from "@repo/inngest";
 
 export const waitForContainer = inngest.createFunction(
   { id: "wait-for-container" },

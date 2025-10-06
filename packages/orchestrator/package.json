@@ -1,18 +1,22 @@
 {
-  "name": "@ai_pair_programmer/orchestrator",
+  "name": "@repo/orchestrator",
   "version": "0.0.0",
   "private": true,
-  "license": "MIT",
-  "type": "module",
-  "main": "containerManager.ts",
-  "publishConfig": {
-    "access": "public"
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint . --ext .ts"
   },
   "dependencies": {
     "dockerode": "^4.0.7",
     "zod": "^4.1.11"
   },
   "devDependencies": {
-    "@types/dockerode": "^3.3.44"
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/dockerode": "^3.3.44",
+    "eslint": "^9.37.0",
+    "typescript": "^5.5.3"
   }
 }

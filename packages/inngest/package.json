@@ -1,13 +1,22 @@
 {
-  "name": "@ai_pair_programmer/inngest",
+  "name": "@repo/inngest",
   "version": "0.0.0",
   "private": true,
-  "license": "MIT",
-  "type": "module",
-  "publishConfig": {
-    "access": "public"
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint . --ext .ts"
   },
   "dependencies": {
     "inngest": "^3.40.2"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "eslint": "^9.37.0",
+    "typescript": "^5.5.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   }
 }
