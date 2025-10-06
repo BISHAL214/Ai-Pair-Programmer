@@ -14,19 +14,19 @@
     "db:check": "drizzle-kit check:pg",
     "db:up": "drizzle-kit up:pg",
     "db:push": "drizzle-kit push:pg",
-    "db:studio": "pnpm dlx drizzle-kit studio"
+    "db:studio": "pnpm drizzle-kit studio --verbose"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
+    "@types/node": "^20.14.9",
+    "dotenv": "^16.4.5",
     "drizzle-kit": "^0.31.4",
     "eslint": "^9.37.0",
-    "typescript": "^5.5.3",
-    "@types/node": "^20.14.9",
-    "dotenv": "^16.4.5"
+    "typescript": "^5.5.3"
   },
   "dependencies": {
-    "drizzle-orm": "^0.44.4",
-    "postgres": "^3.4.4"
+    "drizzle-orm": "^0.44.6",
+    "postgres": "^3.4.7"
   }
 }
