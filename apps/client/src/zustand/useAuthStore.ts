@@ -2,7 +2,7 @@
 "use client";
 
 import { queryClient } from "@/lib/query-client";
-import { supabase } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
 import { AuthChangeEvent, Session } from "@supabase/supabase-js";
 import { create } from "zustand";
 
@@ -11,6 +11,7 @@ interface AuthState {
   isListenerInitialized: boolean;
   initializeListener: () => void;
 }
+const supabase = createClient();
 
 export const useAuthStore = create<AuthState>((set, get) => ({
   isListenerInitialized: false,
@@ -21,11 +22,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
 
     supabase.auth.onAuthStateChange(
-      (event: AuthChangeEvent, session: Session) => {
+      (event: AuthChangeEvent, session: Session | null) => {
         // Invalidate the session query whenever the auth state changes
         console.log(`Supabase auth event: ${event}`);
         console.log("New session:", session);
-        queryClient.setQueryData(["session"], session);
+        queryClient.setQueryData(["session"], session as Session);
       }
     );
 

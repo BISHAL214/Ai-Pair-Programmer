@@ -1,8 +1,5 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 import { AnimatedAIChat } from "@/__components-app/ai-chatInput";
 import { NavigationBar } from "@/components/asternity/navbar";
 import { useAuth } from "@/hooks/use-auth";
@@ -14,10 +11,13 @@ import {
 import { supabase } from "@/lib/utils";
 import { useAuthLogoutMutation } from "@/tanstack/mutations/auth.mutations";
 import { INFO, useProjectStore } from "@/zustand/useProjectStore";
+import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function Page() {
   const router = useRouter();
-  const { user, session } = useAuth(supabase);
+  const { user, session } = useAuth();
   const githubToken = session?.provider_token ?? null;
   const isGitHubConnected = !!githubToken;
 

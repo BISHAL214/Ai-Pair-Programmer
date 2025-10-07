@@ -1,8 +1,8 @@
 "use client";
 
-import { useAuth } from "@/lib/auth";
+import { useAuth } from "@/hooks/use-auth";
 import { INFO, useProjectStore } from "@/zustand/useProjectStore";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { io, Socket } from "socket.io-client";
 
 const SOCKET_SERVER_URL =

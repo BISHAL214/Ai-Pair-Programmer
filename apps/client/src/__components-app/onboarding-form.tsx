@@ -3,14 +3,15 @@
 import AvatarWithCropper from "@/__components-app/avatar-with-croper";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
-import { supabase, supabase_service } from "@/lib/utils";
+import { createServiceCLient } from "@/lib/supabase/client";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
 const OnboardingForm = () => {
-  const { user } = useAuth(supabase);
+  const { user } = useAuth();
+  const supabase_service = createServiceCLient();
   const [finalCroppedAvatar, setFinalCroppedAvatar] = useState<Blob | null>(
-    null,
+    null
   );
 
   const submit = async () => {
