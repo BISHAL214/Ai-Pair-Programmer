@@ -1,6 +1,6 @@
 import { Server } from "socket.io";
 
-let io: Server | null = null;
+const io: Server | null = null;
 
 export function initSocket(server: any) {
   const io = new Server(server, {
