@@ -58,7 +58,7 @@ const worker = new Worker(
       containerInfo: info,
     };
   },
-  { connection, concurrency: 2 }
+  { connection, concurrency: 2 },
 );
 worker.on("completed", (job) => {
   console.log(`✅ Job ${job.id} completed`);

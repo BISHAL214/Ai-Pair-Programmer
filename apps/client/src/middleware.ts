@@ -52,7 +52,7 @@ export async function middleware(request: NextRequest) {
           });
         },
       },
-    }
+    },
   );
 
   // This will refresh the session cookie if it's expired.

@@ -27,7 +27,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         console.log(`Supabase auth event: ${event}`);
         console.log("New session:", session);
         queryClient.setQueryData(["session"], session as Session);
-      }
+      },
     );
 
     set({ isListenerInitialized: true });

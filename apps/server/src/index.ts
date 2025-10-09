@@ -18,7 +18,7 @@ app.use(
     origin: "http://localhost:3000", // Allow specific origin
     allowMethods: ["GET", "POST"], // Allow specific methods
     allowHeaders: ["Content-Type", "Authorization"], // Allow specific headers
-  })
+  }),
 );
 
 app.get("/", (c) => {
@@ -29,7 +29,7 @@ app.get("/", (c) => {
 app.on(
   ["GET", "PUT", "POST"],
   "/api/inngest",
-  serve({ client: inngest, functions: [waitForContainer, startFileSync] })
+  serve({ client: inngest, functions: [waitForContainer, startFileSync] }),
 );
 
 app.post("/api/github-extract", async (c) => {
@@ -60,7 +60,7 @@ app.post("/api/github-extract", async (c) => {
       sourceType,
       projectId,
     },
-    { attempts: 3, removeOnComplete: true }
+    { attempts: 3, removeOnComplete: true },
   );
 
   return c.json({
@@ -72,7 +72,7 @@ app.post("/api/github-extract", async (c) => {
 
 // Helper function to convert a ReadableStream to a Buffer, replacing Bun's implementation
 async function readableStreamToBuffer(
-  stream: ReadableStream<Uint8Array>
+  stream: ReadableStream<Uint8Array>,
 ): Promise<Buffer> {
   const reader = stream.getReader();
   const chunks: Uint8Array[] = [];
@@ -124,7 +124,7 @@ app.post("/api/upload-zip", async (c) => {
       sourceType,
       projectId,
     },
-    { attempts: 3, removeOnComplete: true }
+    { attempts: 3, removeOnComplete: true },
   );
 
   return c.json({ jobId: job.id });

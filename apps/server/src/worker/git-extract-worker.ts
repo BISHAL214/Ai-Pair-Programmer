@@ -22,14 +22,14 @@ console.log("👷 Extract Worker started and waiting for jobs...");
 socketClient.on("connect", () => {
   console.log(
     "🤖 Extract Worker connected to server via WebSocket:",
-    socketClient.id
+    socketClient.id,
   );
 });
 
 socketClient.on("connect_error", (err) => {
   console.error(
     "❌ Extract Extract Worker failed to connect to server via WebSocket:",
-    err
+    err,
   );
 });
 
@@ -50,7 +50,7 @@ const worker = new Worker(
     console.log(`Processing job ${job.id}...`);
     if (sourceType === "github") {
       console.log(
-        `Extracting files from GitHub repo: ${repoName} (${repoUrl})`
+        `Extracting files from GitHub repo: ${repoName} (${repoUrl})`,
       );
       await extractFilesFromGitAndUpload(
         repoUrl,
@@ -58,7 +58,7 @@ const worker = new Worker(
         userId,
         branches,
         token,
-        projectId
+        projectId,
       );
     } else if (sourceType === "zip") {
       console.log(`Extracting files from uploaded zip: ${projectName}`);
@@ -67,7 +67,7 @@ const worker = new Worker(
     console.log(`Finished job ${job.id}`);
     return { status: "done" };
   },
-  { connection, concurrency: 2 }
+  { connection, concurrency: 2 },
 );
 worker.on("completed", (job) => {
   console.log(`✅ Job ${job.id} completed`);

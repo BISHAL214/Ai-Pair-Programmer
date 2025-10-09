@@ -11,7 +11,7 @@ const OnboardingForm = () => {
   const { user } = useAuth();
   const supabase_service = createServiceCLient();
   const [finalCroppedAvatar, setFinalCroppedAvatar] = useState<Blob | null>(
-    null
+    null,
   );
 
   const submit = async () => {

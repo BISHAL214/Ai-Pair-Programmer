@@ -40,7 +40,7 @@ export const users = pgTable(
       for: "update",
       to: ["public"],
     }),
-  ]
+  ],
 );
 
 export const projects = pgTable(
@@ -72,9 +72,9 @@ export const projects = pgTable(
     }),
     check(
       "projects_source_type_check",
-      sql`source_type = ANY (ARRAY['zip'::text, 'github'::text])`
+      sql`source_type = ANY (ARRAY['zip'::text, 'github'::text])`,
     ),
-  ]
+  ],
 );
 
 export const files = pgTable(
@@ -107,7 +107,7 @@ export const files = pgTable(
    FROM projects
   WHERE ((projects.id = files.project_id) AND (projects.user_id = auth.uid()))))`,
     }),
-  ]
+  ],
 );
 
 export const aiOverviews = pgTable(
@@ -145,7 +145,7 @@ export const aiOverviews = pgTable(
    FROM projects
   WHERE ((projects.id = ai_overviews.project_id) AND (projects.user_id = auth.uid()))))`,
     }),
-  ]
+  ],
 );
 
 export const explanations = pgTable(
@@ -182,7 +182,7 @@ export const explanations = pgTable(
    FROM projects
   WHERE ((projects.id = explanations.project_id) AND (projects.user_id = auth.uid()))))`,
     }),
-  ]
+  ],
 );
 
 export const chatMessages = pgTable(
@@ -215,9 +215,9 @@ export const chatMessages = pgTable(
     }),
     check(
       "chat_messages_sender_check",
-      sql`sender = ANY (ARRAY['user'::text, 'ai'::text])`
+      sql`sender = ANY (ARRAY['user'::text, 'ai'::text])`,
     ),
-  ]
+  ],
 );
 
 export const commits = pgTable(
@@ -248,5 +248,5 @@ export const commits = pgTable(
    FROM projects
   WHERE ((projects.id = commits.project_id) AND (projects.user_id = auth.uid()))))`,
     }),
-  ]
+  ],
 );

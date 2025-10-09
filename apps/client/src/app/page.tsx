@@ -28,7 +28,7 @@ export default function Page() {
     "github" | "zip" | ""
   >("");
   const [zipUploadFormData, setZipUploadFormData] = useState<FormData | null>(
-    null
+    null,
   );
 
   const { setProjectUserId, setInfo } = useProjectStore();
@@ -65,7 +65,7 @@ export default function Page() {
       return fetchGitHubBranches(
         githubToken,
         selectedRepo.owner?.login,
-        selectedRepo.name
+        selectedRepo.name,
       );
     },
     enabled: !!githubToken && !!selectedRepo,
@@ -93,7 +93,7 @@ export default function Page() {
         selectedRepo.name,
         user.id,
         selectedBranches,
-        githubToken
+        githubToken,
       );
     },
     enabled: isTheChatStarted && projectSourceType === "github",
@@ -105,7 +105,7 @@ export default function Page() {
     if (extractJob) {
       setProjectUserId(
         extractJob.userId as string,
-        extractJob.projectId as string
+        extractJob.projectId as string,
       );
       setInfo("extraction", extractJob.jobInfo as INFO["extraction"]);
     }
